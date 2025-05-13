@@ -67,6 +67,7 @@ Spectral viene eseguito automaticamente come parte degli hook di pre-commit (se 
 ```bash
 spectral lint --ruleset /workspace/.config/.spectral.yaml openapi_3_1_demo.json
 ```
+
 (Eseguito dalla root del progetto, assumendo che `/workspace` sia il mount point nel container).
 
-L'output di Spectral viene registrato in `evidence/logs/`. 
+L'output di Spectral viene registrato in `evidence/logs/`.

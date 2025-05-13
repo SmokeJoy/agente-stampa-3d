@@ -23,6 +23,7 @@ npm install -g @redocly/cli@<versione_desiderata>
 ```
 
 E la verifica:
+
 ```bash
 redocly --version
 ```
@@ -62,6 +63,7 @@ Questo comando avvia un server web locale che serve la documentazione.
 ### Utilizzo di Plugin Decorator (Esempio Concettuale)
 
 I plugin decorator permettono di modificare dinamicamente la specifica. Ad esempio, un decorator potrebbe essere usato per:
+
 - Aggiungere automaticamente esempi.
 - Inserire informazioni di contatto standard.
 - Modificare descrizioni o sommari.
@@ -69,6 +71,7 @@ I plugin decorator permettono di modificare dinamicamente la specifica. Ad esemp
 La configurazione di un decorator avverrebbe nel file `redocly.yaml`.
 
 **Esempio (ipotetico `redocly.yaml`):**
+
 ```yaml
 apis:
   main: root/openapi_3_1_demo.json # Percorso alla specifica principale
@@ -85,4 +88,4 @@ lint:
 
 ## Stato Attuale nel Progetto
 
-Come menzionato, Redocly CLI non è una dipendenza attiva. Se la sua necessità emergesse (es. per funzionalità di bundling avanzate o per il suo specifico motore di documentazione API), la sua integrazione verrebbe rivalutata e documentata qui con dettagli specifici per il progetto. 
+Come menzionato, Redocly CLI non è una dipendenza attiva. Se la sua necessità emergesse (es. per funzionalità di bundling avanzate o per il suo specifico motore di documentazione API), la sua integrazione verrebbe rivalutata e documentata qui con dettagli specifici per il progetto.

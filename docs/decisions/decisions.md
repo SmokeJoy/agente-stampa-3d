@@ -1,6 +1,6 @@
 ## Decisioni Architetturali e Tecniche
 
-Qui verranno documentate le decisioni significative prese durante lo sviluppo del progetto, con la motivazione alla base di ciascuna scelta. 
+Qui verranno documentate le decisioni significative prese durante lo sviluppo del progetto, con la motivazione alla base di ciascuna scelta.
 
 ### 2023-10-27: Finalizzazione G2 e Migrazione a Poetry
 
@@ -24,4 +24,4 @@ Qui verranno documentate le decisioni significative prese durante lo sviluppo de
 
 - **Conferma Migrazione a Poetry**: La migrazione a Poetry è stata finalizzata e tutti i file di configurazione (pyproject.toml, Dockerfile, devcontainer.json, CI workflow) sono stati allineati per utilizzare Poetry come unico gestore delle dipendenze. Questo include il pinning esatto delle versioni come da specifiche.
 - **Validazione Strumenti CI/CD**: La configurazione per pre-commit, linting, formatting, test e GPG signature check è stata completata e verificata (a livello di configurazione). L'effettiva esecuzione e il passaggio "verde" della pipeline CI sono il prossimo passo di validazione dopo il push.
-- **Struttura Progetto Stabile per G2**: Tutti i deliverable richiesti per il checkpoint G2 sono stati implementati. Il progetto ha una base solida per le fasi successive (G4 e oltre). 
+- **Struttura Progetto Stabile per G2**: Tutti i deliverable richiesti per il checkpoint G2 sono stati implementati. Il progetto ha una base solida per le fasi successive (G4 e oltre).

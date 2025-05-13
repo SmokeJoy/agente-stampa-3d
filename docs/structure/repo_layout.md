@@ -54,4 +54,4 @@ agente-stampa-3D/
 - **`services/`**: Moduli Python che incapsulano la logica di interazione con servizi esterni o API di terze parti (es. API di Google Calendar, API per la ricerca di lavori).
 - **`tests/`**: Contiene tutti i test del progetto, tipicamente organizzati in una struttura che rispecchia quella del codice sorgente. Utilizza `pytest` come framework di testing.
 
-L'utilizzo di `poetry` per la gestione delle dipendenze e del packaging è centrale, con `pyproject.toml` e `poetry.lock` che definiscono e bloccano le dipendenze del progetto. 
+L'utilizzo di `poetry` per la gestione delle dipendenze e del packaging è centrale, con `pyproject.toml` e `poetry.lock` che definiscono e bloccano le dipendenze del progetto.

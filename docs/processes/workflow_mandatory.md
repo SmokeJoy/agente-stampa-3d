@@ -77,4 +77,4 @@ Questo documento definisce il flusso di lavoro operativo che il Dev AI deve segu
 
 ---
 
-Questo flusso garantisce tracciabilità, qualità e allineamento con gli obiettivi del progetto e le aspettative del Teach Lead. 
+Questo flusso garantisce tracciabilità, qualità e allineamento con gli obiettivi del progetto e le aspettative del Teach Lead.

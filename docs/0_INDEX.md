@@ -7,23 +7,23 @@ Benvenuto nella documentazione ufficiale del progetto "AGENTE STAMPA 3D". Questo
 Ecco un elenco gerarchico dei documenti disponibili. Ogni voce è un link cliccabile al relativo file Markdown.
 
 - **`docs/`**
-    - [`0_INDEX.md`](./0_INDEX.md) (Questo file)
-    - **`roadmap/`**
-        - [`ROADMAP_v2.md`](./roadmap/ROADMAP_v2.md) - Roadmap ufficiale del progetto (Versione 2).
-    - **`structure/`**
-        - [`repo_layout.md`](./structure/repo_layout.md) - Descrizione della struttura delle directory del repository.
-        - [`devcontainer.md`](./structure/devcontainer.md) - Dettagli sulla configurazione del Dev Container.
-    - **`processes/`**
-        - [`workflow_mandatory.md`](./processes/workflow_mandatory.md) - Flusso di lavoro obbligatorio per il Dev AI.
-        - [`ci_pipeline.md`](./processes/ci_pipeline.md) - Descrizione della pipeline di Continuous Integration.
-    - **`governance/`**
-        - [`spectral_rules.md`](./governance/spectral_rules.md) - Regole Spectral per il linting delle OpenAPI.
-        - [`redocly_setup.md`](./governance/redocly_setup.md) - Informazioni sull'utilizzo (potenziale) di Redocly CLI.
-        - [`pre_commit.md`](./governance/pre_commit.md) - Configurazione e utilizzo degli hook di pre-commit e Regola GIT-AI-3.
-    - **`logbook/`**
-        - [`logbook_unificato_dev_ai.md`](./logbook/logbook_unificato_dev_ai.md) - Logbook cronologico delle attività di sviluppo.
-    - **`decisions/`**
-        - [`decisions.md`](./decisions/decisions.md) - Registro delle decisioni architetturali e tecniche chiave.
+  - [`0_INDEX.md`](./0_INDEX.md) (Questo file)
+  - **`roadmap/`**
+    - [`ROADMAP_v2.md`](./roadmap/ROADMAP_v2.md) - Roadmap ufficiale del progetto (Versione 2).
+  - **`structure/`**
+    - [`repo_layout.md`](./structure/repo_layout.md) - Descrizione della struttura delle directory del repository.
+    - [`devcontainer.md`](./structure/devcontainer.md) - Dettagli sulla configurazione del Dev Container.
+  - **`processes/`**
+    - [`workflow_mandatory.md`](./processes/workflow_mandatory.md) - Flusso di lavoro obbligatorio per il Dev AI.
+    - [`ci_pipeline.md`](./processes/ci_pipeline.md) - Descrizione della pipeline di Continuous Integration.
+  - **`governance/`**
+    - [`spectral_rules.md`](./governance/spectral_rules.md) - Regole Spectral per il linting delle OpenAPI.
+    - [`redocly_setup.md`](./governance/redocly_setup.md) - Informazioni sull'utilizzo (potenziale) di Redocly CLI.
+    - [`pre_commit.md`](./governance/pre_commit.md) - Configurazione e utilizzo degli hook di pre-commit e Regola GIT-AI-3.
+  - **`logbook/`**
+    - [`logbook_unificato_dev_ai.md`](./logbook/logbook_unificato_dev_ai.md) - Logbook cronologico delle attività di sviluppo.
+  - **`decisions/`**
+    - [`decisions.md`](./decisions/decisions.md) - Registro delle decisioni architetturali e tecniche chiave.
 
 ## 🔄 Stato Roadmap Principale (v2)
 
@@ -43,6 +43,7 @@ La tabella seguente mostra lo stato di avanzamento delle principali fasi e check
 | **G10** (Report finale & compatibility_matrix)      | 240h             | ❌ Pending  |
 
 **Legenda Stato:**
+
 - ✅: Completato / Chiuso
 - ⏳: In Corso / Aperto
 - ❌: Pending / Non iniziato

@@ -1,3 +1,5 @@
+# Diario Personale - Progetto Agente Stampa 3D
+
 Inizio ufficiale del progetto Assistente Lavori Stampa 3D. Settata la struttura di base della documentazione e del repository. Pronto per la configurazione iniziale delle API.
 
 08/06/2024 16:45 - Implementato sistema autenticazione OAuth 2.0 con gestione token persistente. Testato con successo il flusso di autorizzazione via browser.
