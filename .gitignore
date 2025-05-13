@@ -1,0 +1,19 @@
+# Ambiente virtuale Python
+venv/
+
+# File compilati Python
+*.pyc
+__pycache__/
+
+# Credenziali scaricate (se usate)
+client_secret_*.json
+
+# Token OAuth salvato (lo creeremo più avanti)
+token.json
+*.token # Alternativa comune per i file token
+
+# File di variabili d'ambiente (se usati)
+.env
+
+secrets/
+*.json

@@ -1,0 +1,1 @@
+- 08/06/2024 16:45 - Implementato script autenticazione OAuth 2.0 per Google Calendar API

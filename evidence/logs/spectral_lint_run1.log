@@ -1,0 +1,6 @@
+2025-05-13T20:35:13Z
+
+/workspace/openapi_3_1_demo.json
+ 237:13  error  parser  Duplicate key: type  components.schemas.CalendarEvent.properties.attendees.type
+
+✖ 1 problem (1 error, 0 warnings, 0 infos, 0 hints)

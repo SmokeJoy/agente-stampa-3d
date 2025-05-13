@@ -1,0 +1,74 @@
+extends: ["spectral:oas"]
+formats: ["oas3_1"] # Applica a livello di ruleset per OpenAPI 3.1.x
+
+rules:
+  # Regola 1: no-legacy-nullable
+  no-legacy-nullable:
+    description: "Evita l'uso di 'nullable: true' deprecato, preferendo type: ['type', 'null']."
+    message: "La proprietà '{{property}}' (o percorso '{{path}}') usa 'nullable: true'. OpenAPI 3.1.0 preferisce type: [..., \"null\"]."
+    given: "$..[?(@ && @.nullable === true)]" # Seleziona qualsiasi oggetto che ha esplicitamente nullable: true
+    severity: warn
+    then:
+      function: falsy # Fallisce se il valore target (true) è truthy, quindi segnala la presenza di nullable:true
+    formats: ["oas3_1"]
+
+  # Regola 2: require-operationid
+  require-operationid:
+    description: "Ogni operazione API deve avere un operationId definito e non vuoto."
+    message: "L'operazione {{path}} deve avere un 'operationId' univoco e non vuoto."
+    given: "$.paths.*[get,post,put,delete,patch,options,head,trace]" # Seleziona tutti gli oggetti operazione
+    severity: error
+    then:
+      field: "operationId"
+      function: truthy # Assicura che operationId esista e non sia una stringa vuota o altri valori falsy
+    formats: ["oas3_1"]
+
+  # Regola 3: exclusive-minimum-numeric
+  exclusive-minimum-numeric:
+    description: "exclusiveMinimum deve essere un numero in OpenAPI 3.1.0."
+    message: "exclusiveMinimum per {{path}} deve essere un valore numerico."
+    given: "$..*[?(@ && @.exclusiveMinimum !== undefined)]" # Seleziona oggetti con exclusiveMinimum definito
+    severity: error
+    then:
+      field: "exclusiveMinimum"
+      function: schema
+      functionOptions:
+        schema:
+          type: "number"
+    formats: ["oas3_1"]
+
+  # Regola 4: exclusive-maximum-numeric
+  exclusive-maximum-numeric:
+    description: "exclusiveMaximum deve essere un numero in OpenAPI 3.1.0."
+    message: "exclusiveMaximum per {{path}} deve essere un valore numerico."
+    given: "$..*[?(@ && @.exclusiveMaximum !== undefined)]" # Seleziona oggetti con exclusiveMaximum definito
+    severity: error
+    then:
+      field: "exclusiveMaximum"
+      function: schema
+      functionOptions:
+        schema:
+          type: "number"
+    formats: ["oas3_1"]
+
+  # Regola 5: array-query-param-style-explode
+  array-query-param-style-explode:
+    description: "I parametri di query di tipo array dovrebbero usare style: form e explode: true."
+    message: "Il parametro di query array '{{property}}' (o percorso '{{path}}') dovrebbe usare style: form e explode: true."
+    # $.paths.*.*.parameters.*[?(@.in === 'query' && @.schema && @.schema.type === 'array')]
+    given: "$..parameters[?(@ && @.in === 'query' && @.schema && @.schema.type === 'array')]" # Più generico per trovare i parametri ovunque siano definiti (paths o components)
+    severity: warn
+    then:
+      function: schema
+      functionOptions:
+        schema:
+          type: "object"
+          properties:
+            style:
+              const: "form"
+            explode:
+              const: true
+          required:
+            - "style"
+            - "explode"
+    formats: ["oas3_1"] 

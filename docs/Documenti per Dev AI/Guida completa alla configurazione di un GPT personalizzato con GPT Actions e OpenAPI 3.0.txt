@@ -1,0 +1,487 @@
+Perfetto, preparo per te una guida completa e dettagliata su come creare e configurare un GPT personalizzato con Actions, incluso uno schema JSON conforme a OpenAPI 3.0, l’autenticazione API Key/OAuth, la configurazione su chat.openai.com/gpts, e suggerimenti per il deploy dell’API.
+Ti aggiornerò appena è pronta per la revisione.
+
+
+# Guida completa alla configurazione di un GPT personalizzato con GPT Actions e OpenAPI 3.0
+
+Questa guida spiega passo passo come creare un GPT personalizzato su **chat.openai.com/gpts** integrando funzioni relative alla stampa 3D. In particolare, mostriamo come definire uno schema OpenAPI 3.0 che descriva due endpoint di esempio (ricerca di lavori di stampa 3D e aggiunta di eventi a un calendario) e come configurare l’autenticazione (API Key e OAuth2) per usare il **GPT Actions**. Infine, vedremo come caricare lo schema nel builder di GPT e come testare e pubblicare l’API.
+
+## Struttura di base di uno schema OpenAPI 3.0 per GPT Actions
+
+Uno **schema OpenAPI 3.0** è un documento JSON (o YAML) che descrive in modo formale la struttura di un’API REST. Le sezioni principali di uno schema OpenAPI includono:
+
+* **`openapi`**: versione della specifica OpenAPI (es. `"3.0.1"`). Indica la versione del formato usato.
+* **`info`**: un oggetto obbligatorio con i metadati dell’API, tipicamente `title`, `version` e descrizione. Ad esempio, l’oggetto *Info* fornisce informazioni leggibili agli strumenti e agli utenti sull’API.
+* **`servers`**: un array di oggetti *Server* che specificano gli URL base per l’API. Se non fornita, non è possibile chiamare alcuna URL; tipicamente si inserisce almeno un elemento con `"url": "https://api.example.com"`.
+* **`paths`**: l’oggetto principale che elenca i percorsi (endpoint) e le operazioni HTTP (GET, POST, ecc.) supportate. Ad ogni endpoint si associano le relative definizioni di parametri, corpo e risposte.
+* **`components`**: contiene definizioni riutilizzabili, come **`schemas`** (oggetti JSON per request/response) e **`securitySchemes`** (metodi di autenticazione). Gli schemi definiti in `components/schemas` non hanno effetto finché non vengono referenziati altrove.
+* **`security`**: lista globale dei requisiti di sicurezza per l’API. Qui si elencano i nomi degli schemi di sicurezza (definiti in `components/securitySchemes`) applicabili a tutte le operazioni, a meno che non siano sovrascritti a livello di singola operazione. Ad esempio, `security: [{ "ApiKeyAuth": [] }]` indica che per ogni chiamata è richiesta l’API Key definita come `ApiKeyAuth`.
+
+In ogni operazione (ad es. un percorso `"/searchJobs": { "get": { ... } }`), si possono definire:
+
+* **`parameters`**: elenco di parametri URI o query. Un parametro è descritto da `name`, `in` (ad es. `"query"`), `schema` (tipo dati) e se è `required`. I parametri comuni (ad es. identità risorsa) possono essere definiti a livello di `paths` e vengono applicati a tutte le operazioni al suo interno.
+* **`requestBody`**: oggetto che descrive il corpo di una richiesta (solitamente per POST/PUT). Si specifica il `content` (ad es. `application/json`) e uno `schema` che definisce la struttura JSON richiesta. Il campo `required: true` indica che il corpo è obbligatorio.
+* **`responses`**: mappa di codici di stato HTTP a descrizioni e contenuto di risposta. Per ogni codice, si indica `description` e, facoltativamente, il `content` con il relativo schema JSON di risposta. Ad esempio, `"200": { "description": "OK", "content": { "application/json": { "schema": {...} } } }`. È buona pratica includere almeno le risposte `200` e un caso `default` o di errore.
+
+Ogni sezione di questo schema segue le regole della specifica OpenAPI 3.0. Ad esempio, la sezione **`securitySchemes`** dentro `components` serve a definire i metodi di autenticazione, come API Key o OAuth2. Un esempio di definizione di API Key (header `X-API-Key`) è:
+
+```yaml
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+```
+
+Come vedremo più avanti, questo permette di referenziare `ApiKeyAuth` nella sezione `security` dello schema.
+
+## Esempi di endpoint `/searchJobs` (GET) e `/addToCalendar` (POST)
+
+Di seguito presentiamo come definire in OpenAPI i due endpoint richiesti:
+
+* **GET `/searchJobs`**: endpoint di ricerca con parametri query `keyword` e `budget_min`. Esempio di definizione in JSON:
+
+  ```json
+  "/searchJobs": {
+    "get": {
+      "summary": "Ricerca lavori di stampa 3D",
+      "parameters": [
+        {
+          "name": "keyword",
+          "in": "query",
+          "required": false,
+          "schema": { "type": "string" },
+          "description": "Parola chiave per la ricerca"
+        },
+        {
+          "name": "budget_min",
+          "in": "query",
+          "required": false,
+          "schema": { "type": "number" },
+          "description": "Budget minimo"
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "OK",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": { "$ref": "#/components/schemas/Job" }
+              }
+            }
+          }
+        },
+        "default": {
+          "description": "Errore",
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/Error" }
+            }
+          }
+        }
+      }
+    }
+  }
+  ```
+
+  Qui, `parameters` elenca i due parametri di query (ognuno con `name`, `in: "query"`, tipo, ecc.). Nelle `responses`, la risposta 200 è un array di oggetti `Job` (definito nei componenti), mentre il caso `default` rimanda a uno schema `Error`.
+
+* **POST `/addToCalendar`**: endpoint di creazione evento con corpo JSON. Esempio di definizione:
+
+  ```json
+  "/addToCalendar": {
+    "post": {
+      "summary": "Aggiungi evento 3D al calendario",
+      "requestBody": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "title": { "type": "string" },
+                "description": { "type": "string" },
+                "datetime": { "type": "string", "format": "date-time" },
+                "url": { "type": "string", "format": "uri" }
+              },
+              "required": ["title", "datetime"]
+            }
+          }
+        }
+      },
+      "responses": {
+        "201": {
+          "description": "Evento creato",
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/Event" }
+            }
+          }
+        },
+        "default": {
+          "description": "Errore",
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/Error" }
+            }
+          }
+        }
+      }
+    }
+  }
+  ```
+
+  In questo caso, `requestBody` descrive l’oggetto JSON con i campi `title`, `description`, `datetime` e `url`. Si noti il campo `"required": ["title", "datetime"]` che indica i campi obbligatori nel corpo. Nella sezione `responses`, il codice 201 (Created) restituisce uno schema `Event`; il caso `default` rimanda a `Error`.
+
+Le definizioni di `Job`, `Event` ed `Error` sono inserite nella sezione `components/schemas` (es. con proprietà tipo stringa o integer) e referenziate tramite `$ref` nelle operazioni. Ad esempio, il tipo `Error` potrebbe essere:
+
+```json
+"Error": {
+  "type": "object",
+  "properties": {
+    "code": { "type": "integer" },
+    "message": { "type": "string" }
+  },
+  "required": ["code","message"]
+}
+```
+
+e uno `Job` semplice come:
+
+```json
+"Job": {
+  "type": "object",
+  "properties": {
+    "id": { "type": "integer" },
+    "title": { "type": "string" },
+    "budget": { "type": "number" }
+  },
+  "required": ["id","title"]
+}
+```
+
+Questi riferimenti permettono al GPT di sapere quale struttura JSON aspettarsi nelle risposte e richieste.
+
+## Definizione corretta di parameters, requestBody e responses
+
+Nel contesto di OpenAPI:
+
+* **Parametri (`parameters`)**: ogni parametro di query o path deve avere `name`, `in` (posizione), `schema` (tipo) e `description`. La specifica richiede che nel percorso e nell’operazione non vi siano parametri duplicati. Ad esempio, `"budget_min"` è definito con `"in": "query"` e schema number.
+* **Corpo della richiesta (`requestBody`)**: si usa per metodi come POST. Si specifica un oggetto `content` con il media type (es. `application/json`) e all’interno uno schema che descrive i campi JSON. Nel nostro esempio, abbiamo incluso `required: ["title","datetime"]` per rendere obbligatori quei campi.
+* **Risposte (`responses`)**: per ogni codice di stato si dà `description` e, se serve, il `content` con lo schema di risposta. La definizione delle risposte aiuta il GPT a sapere come parsare ciò che riceve dall’API. Ad esempio, il codice 200 restituisce un array di `Job`, quindi impostiamo `"schema": { "type": "array", "items": { "$ref": "#/components/schemas/Job" } }`.
+
+Queste convenzioni sono parte della struttura `paths` di OpenAPI, che *“tiene i percorsi relativi ai singoli endpoint e alle loro operazioni”*. È importante descrivere ogni parametro e corpo con precisione per evitare ambiguità.
+
+## Autenticazione: API Key e OAuth 2.0
+
+Il GPT Actions supporta diversi metodi di autenticazione, configurati nello schema OpenAPI:
+
+* **API Key (header)**: si definisce in `components/securitySchemes` un oggetto di tipo `apiKey`. Per esempio:
+
+  ```json
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-API-Key"
+      }
+    }
+  }
+  ```
+
+  Questo schema dice che ogni richiesta deve includere un header `X-API-Key` con la chiave segreta. Successivamente, nella sezione globale `security` si fa riferimento al nome `ApiKeyAuth` così definito:
+
+  ```json
+  "security": [ { "ApiKeyAuth": [] } ]
+  ```
+
+  Ciò richiede che l’header sia sempre presente. Nell’editor di GPT si può configurare il campo API Key (ad es. `{YOUR_API_KEY}`) e il nome custom dell’header (come “X-Api-Key”). L’API Key è consigliata per autenticare API interne o servizi server-to-server, quando non serve coinvolgere un utente finale.
+
+* **OAuth 2.0 (Authorization Code Grant)**: si definisce uno schema di tipo `oauth2` con il flusso `authorizationCode`. Ad esempio:
+
+  ```yaml
+  components:
+    securitySchemes:
+      OAuth2Auth:
+        type: oauth2
+        flows:
+          authorizationCode:
+            authorizationUrl: https://esempio.com/oauth/authorize
+            tokenUrl: https://esempio.com/oauth/token
+            scopes:
+              openid: OpenID Connect scope
+              profile: User profile scope
+  ```
+
+  Qui si indicano l’Authorization URL e il Token URL del provider OAuth, oltre agli scope richiesti. In `security` si può specificare gli scope necessari, ad es.:
+
+  ```json
+  "security": [ { "OAuth2Auth": ["openid","profile"] } ]
+  ```
+
+  Nel **builder GPT Actions** bisogna passare le credenziali OAuth. Nella configurazione dell’azione (scheda “Authentication”), si seleziona “OAuth” e si inseriscono **Client ID** e **Client Secret** ottenuti dal provider, insieme agli URL di autorizzazione e token e agli scope richiesti. Ad esempio, per l’API Google Sheets si userà `authorizationUrl: https://accounts.google.com/o/oauth2/auth` e `tokenUrl: https://oauth2.googleapis.com/token`. L’uso di OAuth è consigliato quando si deve agire a nome di un utente finale (delegated access) e si richiede il consenso dell’utente, ad es. su API Google o simili.
+
+In sintesi, i metodi sono configurati così nel file JSON:
+
+```json
+"components": {
+  "securitySchemes": {
+    "ApiKeyAuth": { "type": "apiKey", "in": "header", "name": "X-API-Key" },
+    "OAuth2Auth": {
+      "type": "oauth2",
+      "flows": {
+        "authorizationCode": {
+          "authorizationUrl": "https://provider.example.com/auth",
+          "tokenUrl": "https://provider.example.com/token",
+          "scopes": { "read": "Read access" }
+        }
+      }
+    }
+  }
+},
+"security": [ { "ApiKeyAuth": [] } ]
+```
+
+In questo esempio globale, si richiede solo `ApiKeyAuth`, ma si potrebbe anche alternare o specificare per ciascuna operazione il metodo opportuno.
+
+## Configurazione dello schema nel costruttore GPT su chat.openai.com/gpts
+
+Una volta preparato lo schema OpenAPI, si procede così nel **GPT Builder**:
+
+1. **Creare un nuovo GPT**: andare su *chat.openai.com/gpts*, cliccare su “+ Create” e dare nome/descrizione al GPT (ad es. “Assistente per stampa 3D”). Nella tab **Actions**, cliccare “Create new action”.
+2. **Caricare lo schema OpenAPI**: nell’area dedicata allo schema si può **incollare il JSON** direttamente o fare “Import from URL” se lo si è ospitato online. In pratica, “OpenAI now hosts the OpenAPI specification for your API”; quindi è sufficiente fornire il testo JSON. Dopo aver incollato, l’editor mostrerà gli “Available Actions” estratti dallo schema.
+3. **Inserire i dati di autenticazione**: spostarsi sulla scheda **Authentication** dell’azione. Se si usa API Key, selezionare *Authentication Type: API Key* e inserire:
+
+   * **API Key**: digitare `{ENTER YOUR API KEY}` o un segnaposto (il GPT lo sostituirà alla chiamata).
+   * **Auth Type**: scegliere “Custom” se si vuole un header personalizzato.
+   * **Custom Header Name**: ad es. `X-Api-Key`, per concordare con il campo `name` dello schema.
+     Se si sceglie OAuth, invece selezionare *Authentication Type: OAuth* e compilare i campi **Client ID**, **Client Secret**, **Authorization URL**, **Token URL**, **Scope** e **Token Exchange Method** (come “Basic” o “POST”). Questi valori devono corrispondere a quanto dichiarato nello schema (`flows.authorizationCode`).
+4. **Salvare e testare**: dopo aver salvato la configurazione, usare la funzione di test dell’azione (pulsante *Prova ora* o *Call this function*). In questo modo il builder invia una richiesta fittizia con valori campione all’endpoint e mostra la risposta o eventuali errori. Ciò permette di verificare che lo schema e l’autenticazione siano configurati correttamente.
+
+In sintesi, l’UI del GPT builder facilita l’importazione dello schema e la definizione delle credenziali. Ad esempio, un tutorial mostra che nella sezione authentication si inseriscono la API Key e il nome dell’header come descritto, mentre un altro mostra campi analoghi per OAuth (Client ID/Secret, URL di autorizzazione/token).
+
+## File `action_schema.json` di esempio
+
+Ecco un file `action_schema.json` completo (minimale) che include i due endpoint sopra e l’autenticazione API Key via header **X-API-Key**.
+
+```json
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Stampa3D API",
+    "version": "1.0.0",
+    "description": "API per funzioni di supporto alla stampa 3D"
+  },
+  "servers": [
+    {
+      "url": "https://api.esempio3dprint.com/v1"
+    }
+  ],
+  "paths": {
+    "/searchJobs": {
+      "get": {
+        "summary": "Ricerca lavori stampa 3D",
+        "parameters": [
+          {
+            "name": "keyword",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "string" },
+            "description": "Parola chiave"
+          },
+          {
+            "name": "budget_min",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "number" },
+            "description": "Budget minimo"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista di lavori trovati",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/Job" }
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Errore generico",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/addToCalendar": {
+      "post": {
+        "summary": "Aggiungi evento al calendario 3D",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": { "type": "string" },
+                  "description": { "type": "string" },
+                  "datetime": { "type": "string", "format": "date-time" },
+                  "url": { "type": "string", "format": "uri" }
+                },
+                "required": ["title", "datetime"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Evento creato",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Event" }
+              }
+            }
+          },
+          "default": {
+            "description": "Errore generico",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Job": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "title": { "type": "string" },
+          "budget": { "type": "number" }
+        },
+        "required": ["id", "title"]
+      },
+      "Event": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "title": { "type": "string" },
+          "datetime": { "type": "string", "format": "date-time" }
+        },
+        "required": ["id", "title", "datetime"]
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "code": { "type": "integer" },
+          "message": { "type": "string" }
+        },
+        "required": ["code", "message"]
+      }
+    },
+    "securitySchemes": {
+      "ApiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-API-Key"
+      }
+    }
+  },
+  "security": [
+    {
+      "ApiKeyAuth": []
+    }
+  ]
+}
+```
+
+## Spiegazione del file JSON sezione per sezione
+
+* **`openapi`**: specifica la versione OAS (es. `"3.0.1"`). Indica quale versione del formato JSON/OpenAPI si sta usando.
+* **`info`**: oggetto Info che descrive l’API (titolo, versione, descrizione). È obbligatorio ed è usato per documentazione o tool automatici. Nel nostro esempio abbiamo impostato `"title": "Stampa3D API"` e `"version": "1.0.0"`.
+* **`servers`**: array di Server. Qui indichiamo l’URL base dove risiede l’API (ad es. `"https://api.esempio3dprint.com/v1"`). Ogni path successivo (`paths`) verrà appeso a questo URL per formare la chiamata completa.
+* **`paths`**: contiene i percorsi relativi agli endpoint. Nel JSON sopra abbiamo due path: `"/searchJobs"` e `"/addToCalendar"`. Ognuno ha una o più operazioni (qui `get` per il primo, `post` per il secondo). Questa sezione *“tiene i percorsi relativi ai singoli endpoint e alle loro operazioni”*.
+
+  * In **`/searchJobs`** -> **`get`**: abbiamo definito `summary`, `parameters` e `responses`. I `parameters` sono due query string (`keyword`, `budget_min`) con i loro tipi e descrizioni. In `responses`, il codice 200 restituisce un array di schemi `Job`, il codice `default` usa lo schema `Error`.
+  * In **`/addToCalendar`** -> **`post`**: abbiamo `summary`, `requestBody` e `responses`. Il `requestBody` è obbligatorio e specifica che si accetta JSON con le proprietà indicate (`title`, `description`, ecc.). Nelle `responses`, il codice 201 crea lo schema `Event`, mentre `default` fa riferimento a `Error`.
+* **`components/schemas`**: qui definiamo oggetti riutilizzabili. Abbiamo creato tre schemi: `Job`, `Event` ed `Error`. Ad esempio, `Job` è un oggetto con proprietà `id` (integer), `title` (string) e `budget` (number). Questi schemi vengono poi referenziati con `$ref` nelle operazioni (`#/components/schemas/Job` ecc.). La sezione **components** *“tiene un set di oggetti riutilizzabili”*, e gli oggetti definiti qui non influenzano l’API finché non sono referenziati.
+* **`components/securitySchemes`**: definisce i metodi di autenticazione disponibili. Nel nostro schema c’è solo `ApiKeyAuth` di tipo `apiKey` sul header `X-API-Key`. Questa definizione in pratica dice al modello GPT che, quando effettua la chiamata, deve includere quel header.
+* **`security`**: sezione globale che elenca quali schemi di sicurezza devono essere applicati. Qui abbiamo `[{ "ApiKeyAuth": [] }]`, il che significa che tutte le operazioni usano l’autenticazione `ApiKeyAuth` appena definita. In generale, questa sezione *“dichiara quale meccanismo di sicurezza può essere usato su tutta l’API”*. Si noti che si potrebbe definire diversamente a livello di singola operazione se necessario.
+
+In sintesi, questo file JSON segue la struttura standard di OpenAPI 3.0: `openapi`, `info`, `servers`, `paths` con dettagli di ogni operazione, e infine `components` con schemi e sicurezza. Le impostazioni di autenticazione (qui API Key) permettono al GPT di sapere come autenticarsi quando esegue le chiamate.
+
+## Testing degli endpoint con Postman e curl
+
+Per verificare il funzionamento dell’API, si possono usare tool come **Postman** o **curl**:
+
+* **Postman**: creare una nuova richiesta impostando metodo e URL (`GET https://api.esempio3dprint.com/v1/searchJobs`, ad es.). Inserire nella sezione **Params** i valori di `keyword` e `budget_min` desiderati. Nella tab **Headers**, aggiungere il campo `X-API-Key` con la chiave (come definito). Inviare la richiesta e controllare la risposta JSON. Per il POST, selezionare `POST https://api.esempio3dprint.com/v1/addToCalendar`, poi nella tab **Body** inserire i dati JSON (title, description, ecc.) e i corretti headers.
+* **curl**: da linea di comando. Esempio per il GET:
+
+  ```bash
+  curl -X GET "https://api.esempio3dprint.com/v1/searchJobs?keyword=progetto&budget_min=50" \
+       -H "X-API-Key: TUO_API_KEY"
+  ```
+
+  Per il POST:
+
+  ```bash
+  curl -X POST "https://api.esempio3dprint.com/v1/addToCalendar" \
+       -H "X-API-Key: TUO_API_KEY" \
+       -H "Content-Type: application/json" \
+       -d '{"title": "Stampa 3D", "description": "Prototipo", "datetime": "2025-05-01T10:00:00Z", "url": "https://esempio.com"}'
+  ```
+
+  Questi comandi mostrano la risposta dell’API direttamente nel terminale. È un modo rapido per testare senza interfaccia grafica. In ogni caso, bisogna sostituire `TUO_API_KEY` con la chiave reale e modificare URL e parametri secondo l’API.
+
+## Pubblicazione e hosting dell’API
+
+Una volta sviluppata, l’API può essere resa disponibile su internet con vari metodi:
+
+* **Render**: piattaforma di hosting cloud facile da usare. Si collega un repository Git (ad es. GitHub) con il codice Python (FastAPI) o altro, si crea un nuovo Web Service e si configura il comando di avvio (es. `uvicorn main:app --host 0.0.0.0 --port $PORT`). Render esegue build automatiche e fornisce un URL pubblico con HTTPS gratuito. La [documentazione Render](https://render.com/docs/deploy-fastapi) spiega come pubblicare un’app FastAPI in pochi click.
+* **Vercel**: piattaforma popolare per hosting serverless. Oggi supporta anche API in Python (tramite funzioni serverless). Si può deployare un progetto FastAPI configurando un file `vercel.json` oppure eseguendo `vercel --prod` dalla CLI. Vercel genera un URL pubblico per la funzione. (Esistono guide per pubblicare FastAPI su Vercel, e.g. [Dev.to](https://dev.to) o tutorial dedicati.)
+* **Cloudflare Tunnel**: servizio che espone la tua applicazione locale tramite un tunnel sicuro senza richiedere deployment su cloud. Installando `cloudflared` e lanciando `cloudflared tunnel --url http://localhost:8000`, si ottiene un URL pubblico che punta alla porta locale (simile a Ngrok). Cloudflare Tunnel è gratuito, a lunga durata e si integra con il network Cloudflare. È utile per demo rapide o testing, ma anche per hostare servizi in locale con accesso esterno continuativo.
+* **FastAPI (o altro framework)**: indipendentemente dalla piattaforma, un modo comune è implementare l’API con **FastAPI** in Python (o Express in Node, Django, etc.). FastAPI permette di definire facilmente gli endpoint con poche righe di codice. Ad esempio:
+
+  ```python
+  from fastapi import FastAPI
+  from pydantic import BaseModel
+
+  app = FastAPI()
+
+  class Event(BaseModel):
+      title: str
+      description: str = None
+      datetime: str
+      url: str = None
+
+  @app.get("/searchJobs")
+  def search_jobs(keyword: str = None, budget_min: float = None):
+      # Logica fittizia
+      return [{"id": 1, "title": f"Cerca {keyword}", "budget": budget_min or 0.0}]
+
+  @app.post("/addToCalendar")
+  def add_to_calendar(event: Event):
+      # Logica fittizia
+      return {"id": 123, "title": event.title, "datetime": event.datetime}
+  ```
+
+  Questo è un esempio minimale che definisce i due endpoint. Il file Python può poi essere eseguito localmente con `uvicorn main:app` e testato con curl/Postman prima del deploy. In fase di deployment (su Render, Vercel, Heroku, ecc.), l’app rimane molto simile, e ci si focalizza sulle configurazioni (port, segreti, proxy).
+
+In generale, la scelta della piattaforma dipende dalle esigenze: Render e Vercel offrono deployment semplici con continua integrazione Git e HTTPS, mentre Cloudflare Tunnel è ideale per esporre servizi locali in modo rapido. FastAPI, con la sua semplicità e prestazioni, è spesso consigliato per costruire l’API di backend. Seguendo questi passaggi, si può lanciare rapidamente un servizio API che il vostro GPT personalizzato potrà chiamare tramite le **Actions**, estendendo così le capacità di ChatGPT nel dominio della stampa 3D (o di qualsiasi altro ambito).
+
+**Fonti:** Specifiche OpenAPI 3.0; documentazione GPT Actions di OpenAI e tutorial vari sulla configurazione del GPT Builder. (Per approfondimenti su autenticazione e schemi vedi anche i riferimenti indicati.)
