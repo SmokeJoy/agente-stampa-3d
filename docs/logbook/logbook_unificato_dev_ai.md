@@ -194,3 +194,9 @@ Inizio implementazione del micro-task "RULE-PATCH #03".
 * L'operazione di modifica del file `docs/0_INDEX.md` ha presentato un problema di troncamento, successivamente risolto. Questo evidenzia la necessità di verificare l'integrità dei file dopo operazioni di modifica automatizzate, specialmente se multiple o complesse.
 
 ---
+
+**DATA:** 2024-07-28T12:00:00Z
+**TICKET:** RULE-PATCH #03 – markdownlint OK
+**DETTAGLI:** Configurati `.markdownlintignore` e `.markdownlint.json` per escludere `docs/**` e gestire eccezioni. Corretti file `README.md` e `DIARIO_PERSONALE.md` (con override) per conformità. `pre-commit run markdownlint --all-files` ora esce con codice 0.
+
+---
