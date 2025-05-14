@@ -35,7 +35,7 @@ La tabella seguente mostra lo stato di avanzamento delle principali fasi e check
 | **S-2 (Dev Container & Linting Setup)**             | (cfr. G2)        | ✅ Completata |
 | **S-3 (Fix Spectral Warnings & Pre-commit)**        | (cfr. G4)        | ✅ Completata |
 | **D-1 (Documentazione Iniziale Strutturata)**       | (T0 + 48h)       | ✅ Completata |
-| **G4-MOD (Docs Struttura: Code Map & Modular Plan)**| (cfr. G4)        | ✅ Completata |
+| **G4-MOD (Docs Struttura: Code Map & Modular Plan)**| (cfr. G4)        | ✅ *completato* |
 | ---                                                 | ---              | ---         |
 | **G2** (Dev‑container, CI, settings, refactor auth) | 24h              | ✅ Completato |
 | **G4** (Schema demo 3.1 + Spectral 0‑err ≤2‑warn)   | 96h              | ⏳ In corso  |

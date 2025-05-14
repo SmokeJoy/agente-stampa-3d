@@ -39,3 +39,4 @@ repos:
         # Per Docker, l'entry dovrebbe essere solo 'spectral lint ...' se è nel PATH del container.
         pass_filenames: true # Cruciale per passare i nomi dei file all'entry point
         args: ["--display-only-failures"] # Mostra solo i fallimenti
+ 

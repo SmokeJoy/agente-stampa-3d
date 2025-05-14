@@ -227,3 +227,99 @@ Inizio implementazione del micro-task "RULE-PATCH #03".
 **OBIETTIVO:** Avere `pre-commit run markdownlint --all-files` che esegua correttamente, rispettando le configurazioni e ignorando i file specificati, e che il file `ROADMAP.md` nella root sia correttamente formattato.
 
 ---
+
+**DATA:** 2025-05-14T02:17:24Z
+**TICKET:** D-1
+**ATTIVITÀ:** Chiusura ticket D-1: Documentazione strutturale.
+**DETTAGLI:**
+Completamento della fase di documentazione strutturale come da indicazioni del Teach Lead.
+La documentazione è stata verificata e risulta allineata con i requisiti.
+**FILE MODIFICATI:**
+- `docs/0_INDEX.md` (stato G4-MOD)
+- `docs/logbook/logbook_unificato_dev_ai.md` (questa voce)
+**MOTIVAZIONE:** Chiusura formale del task di documentazione D-1.
+**ESITO:** COMPLETATO
+
+---
+
+**DATA:** 2025-05-14T02:17:24Z
+**TICKET:** G6-INIT
+**ATTIVITÀ:** Apertura ticket G6-INIT: Preparazione per implementazione webhook e rate-limit.
+**DETTAGLI:**
+Avvio della preparazione per il checkpoint G6, che includerà l'implementazione di webhook e meccanismi di rate-limiting, come da roadmap.
+**FILE MODIFICATI:**
+- `docs/logbook/logbook_unificato_dev_ai.md` (questa voce)
+**MOTIVAZIONE:** Preparazione del terreno per il prossimo checkpoint di sviluppo G6.
+**ESITO:** In preparazione
+
+---
+
+**DATA:** 2025-05-14T02:17:24Z
+**TICKET:** G4-MOD (Finalizzazione)
+**ATTIVITÀ:** Esecuzione finale `pre-commit run --all-files` per G4-MOD.
+**DETTAGLI:**
+Esecuzione di tutti gli hook di pre-commit su tutti i file per tracciare lo stato di linting finale del checkpoint G4-MOD.
+**FILE MODIFICATI:** Nessuno (solo output loggato).
+**MOTIVAZIONE:** Tracciabilità dello stato dei controlli pre-commit.
+**RISULTATO TEST PRE-COMMIT:**
+```
+black....................................................................Passed
+isort....................................................................Passed
+flake8...................................................................Passed
+markdownlint.............................................................Failed
+- hook id: markdownlint
+- exit code: 1
+
+Usage: markdownlint [options] [files|directories|globs...]
+
+MarkdownLint Command Line Interface
+
+Arguments:
+  files|directories|globs                    files, directories, and/or globs to lint
+
+Options:
+  -V, --version                              output the version number
+  -c, --config <configFile>                  configuration file (JSON, JSONC, JS, YAML, or TOML)
+  --configPointer <pointer>                  JSON Pointer to object within configuration file (default: \"\") 
+  -d, --dot                                  include files/folders with a dot (for example `.github`)
+
+  -f, --fix                                  fix basic errors (does not work with STDIN)
+  -i, --ignore <file|directory|glob>         file(s) to ignore/exclude (default: [])
+  -j, --json                                 write issues in json format
+  -o, --output <outputFile>                  write issues to file (no console)
+  -p, --ignore-path <file>                   path to file with ignore pattern(s)
+  -q, --quiet                                do not write issues to STDOUT
+  -r, --rules <file|directory|glob|package>  include custom rule files (default: [])
+  -s, --stdin                                read from STDIN (does not work with files)
+  --enable <rules...>                        Enable certain rules, e.g. --enable MD013 MD041 --
+  --disable <rules...>                       Disable certain rules, e.g. --disable MD013 MD041 --
+  -h, --help                                 display help for command
+(node:1336) [DEP0176] DeprecationWarning: fs.R_OK is deprecated, use fs.constants.R_OK instead
+(Use `node --trace-deprecation ...` to show where the warning was created)
+ROADMAP.md:23:1 MD009/no-trailing-spaces Trailing spaces [Expected: 0 or 2; Actual: 1]
+ROADMAP.md:24 MD012/no-multiple-blanks Multiple consecutive blank lines [Expected: 1; Actual: 2]
+
+fix end of files.........................................................Passed
+check yaml...............................................................Passed
+Detect secrets...........................................................Passed
+Spectral Lint OpenAPI....................................................Passed
+```
+
+---
+
+**DATA:** 2025-05-14T02:24:35Z
+**TICKET:** G4-MOD – rimozione ROADMAP duplicata
+**ATTIVITÀ:** eliminato ROADMAP.md radice; override MD013/MD033 rimosso; pipeline ok.
+**DETTAGLI:**
+- Eseguito `git rm -f ROADMAP.md` per rimuovere il file duplicato dalla root.
+- Modificato `.config/.markdownlint.json` per rimuovere la sezione di override per `ROADMAP.md`.
+- Verificato che `docs/0_INDEX.md` non contenesse link errati.
+- Eseguito `pre-commit run --all-files` con esito positivo (tutti Passed).
+**FILE MODIFICATI/ELIMINATI:**
+- `ROADMAP.md` (eliminato)
+- `.config/.markdownlint.json` (modificato)
+- `docs/logbook/logbook_unificato_dev_ai.md` (questa voce)
+**MOTIVAZIONE:** Eliminazione di file duplicati e semplificazione della configurazione di linting, mantenendo una singola fonte di verità per la roadmap.
+**ESITO PRE-COMMIT:** Tutti gli hook PASSATI.
+
+---
