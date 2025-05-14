@@ -16,17 +16,36 @@ agente-stampa-3D/
 │   ├── 0_INDEX.md
 │   ├── roadmap/
 │   ├── structure/
+│   │   ├── repo_layout.md
+│   │   ├── devcontainer.md
+│   │   └── modular_plan.md
 │   ├── processes/
 │   ├── governance/
 │   ├── logbook/
 │   └── decisions/
 ├── evidence/                # Log e output generati da strumenti (es. report di linting, test)
 │   └── logs/
+├── infra/                   # Infrastruttura come codice (es. Docker Compose files)
+│   └── docker-compose.redis.yml
 ├── scripts/                 # Script di utilità per lo sviluppo o la CI
+│   └── test_builder_upload.py
 ├── secrets/                 # File di secret (es. client_secret.json, token.json - **NON COMMETTERE**)
-├── services/                # Moduli per l'integrazione con API esterne (es. Google Calendar)
-│   └── google_calendar/
+├── services/                # Moduli per l'integrazione con API esterne o logiche di servizio core
+│   ├── google_calendar/     # Modulo specifico per Google Calendar (potrebbe essere refactored)
+│   ├── uploader/            # Servizio di upload file (STL/OBJ)
+│   │   ├── storage.py
+│   │   ├── uploader_service.py
+│   │   └── validator.py
+│   ├── webhook/             # Servizio Webhook PoC
+│   │   ├── router.py
+│   │   └── handler.py
+│   └── redis/               # Client e utilità Redis
+│       └── redis_client.py
 ├── tests/                   # Test unitari e di integrazione (pytest)
+│   └── uploader/
+│       └── test_uploader.py
+├── utils/                   # Utilità trasversali (es. decoratori, helpers)
+│   └── ratelimit.py
 ├── venv/                    # Ambiente virtuale Python (di solito in .gitignore)
 ├── .gitignore               # Specifica i file e le directory da ignorare per Git
 ├── .pre-commit-config.yaml  # Configurazione degli hook di pre-commit
@@ -49,9 +68,10 @@ agente-stampa-3D/
 - **`config/`**: Contiene la logica di configurazione dell'applicazione, tipicamente attraverso Pydantic Settings, per gestire variabili d'ambiente e parametri di configurazione.
 - **`docs/`**: Il cuore della documentazione del progetto. Organizzata in sottodirectory tematiche per facilitare la navigazione e la comprensione.
 - **`evidence/`**: Raccoglie prove tangibili dell'esecuzione di processi, come i log generati da Spectral o da altri strumenti di linting e testing.
-- **`scripts/`**: Script ausiliari che automatizzano compiti ripetitivi o supportano processi di sviluppo/CI (es. generazione dati di test, build specifiche).
+- **`scripts/`**: Script ausiliari che automatizzano compiti ripetitivi o supportano processi di sviluppo/CI (es. generazione dati di test, build specifiche, test manuali di endpoint).
 - **`secrets/`**: Destinata a contenere file sensibili come chiavi API o credenziali OAuth. **Questa cartella DEVE essere presente nel `.gitignore`** per evitare il commit di dati sensibili.
-- **`services/`**: Moduli Python che incapsulano la logica di interazione con servizi esterni o API di terze parti (es. API di Google Calendar, API per la ricerca di lavori).
+- **`services/`**: Moduli Python che incapsulano la logica di interazione con servizi esterni, API di terze parti, o logiche di business core del progetto (es. upload, webhook, client Redis).
 - **`tests/`**: Contiene tutti i test del progetto, tipicamente organizzati in una struttura che rispecchia quella del codice sorgente. Utilizza `pytest` come framework di testing.
+- **`utils/`**: Contiene moduli Python con funzioni di utilità generale, decoratori, o classi helper che possono essere riutilizzate in diverse parti del progetto.
 
 L'utilizzo di `poetry` per la gestione delle dipendenze e del packaging è centrale, con `pyproject.toml` e `poetry.lock` che definiscono e bloccano le dipendenze del progetto.

@@ -323,3 +323,44 @@ Spectral Lint OpenAPI....................................................Passed
 **ESITO PRE-COMMIT:** Tutti gli hook PASSATI.
 
 ---
+
+**DATA:** 2025-05-14T02:29:21Z
+**TICKET:** G6-INIT
+**ATTIVITÀ:** Scaffolding per Uploader, Webhook, Redis, Rate-limit e script di test.
+**DETTAGLI:**
+Creazione della struttura di directory e file vuoti (con docstring "TODO" o commenti placeholder) per i seguenti moduli come da piano G6-INIT:
+- `services/uploader/storage.py`
+- `services/uploader/uploader_service.py`
+- `services/uploader/validator.py`
+- `tests/uploader/test_uploader.py` (e directory `tests/uploader/`)
+- `services/webhook/router.py`
+- `services/webhook/handler.py` (e directory `services/webhook/`)
+- `infra/docker-compose.redis.yml` (e directory `infra/`)
+- `services/redis/redis_client.py` (e directory `services/redis/`)
+- `utils/ratelimit.py` (e directory `utils/`)
+- `scripts/test_builder_upload.py`
+
+Documentazione aggiornata:
+- `docs/structure/modular_plan.md`: Aggiunta sezione per G6.
+- `docs/structure/repo_layout.md`: Aggiornata struttura directory.
+- `docs/0_INDEX.md`: Stato G6 aggiornato a "In corso".
+
+**FILE MODIFICATI/CREATI:**
+- `services/uploader/storage.py` (creato)
+- `services/uploader/uploader_service.py` (creato)
+- `services/uploader/validator.py` (creato)
+- `tests/uploader/test_uploader.py` (creato)
+- `services/webhook/router.py` (creato)
+- `services/webhook/handler.py` (creato)
+- `infra/docker-compose.redis.yml` (creato)
+- `services/redis/redis_client.py` (creato)
+- `utils/ratelimit.py` (creato)
+- `scripts/test_builder_upload.py` (creato)
+- `docs/structure/modular_plan.md` (modificato)
+- `docs/structure/repo_layout.md` (modificato)
+- `docs/0_INDEX.md` (modificato)
+- `docs/logbook/logbook_unificato_dev_ai.md` (questa voce)
+**MOTIVAZIONE:** Preparazione dell'ambiente per lo sviluppo delle funzionalità del checkpoint G6, come da traccia operativa.
+**ESITO:** Struttura creata, documentazione aggiornata. Nessun codice implementativo inserito.
+
+---

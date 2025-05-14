@@ -110,3 +110,35 @@ Questo documento descrive la struttura modulare futura proposta per il progetto 
    - **`helpers.py`**: Funzioni di utilità generiche (es. manipolazione date, stringhe, ecc.).
 
 Questa struttura è una base di partenza e potrà evolvere con le necessità del progetto. L'obiettivo primario è mantenere ogni modulo focalizzato su una singola responsabilità e con interfacce ben definite. 
+
+---
+
+## G6 - Builder Uploader, Webhook, Rate Limit, Redis
+
+Questa sezione descrive la struttura modulare pianificata per il checkpoint G6.
+
+### 1. Builder Uploader
+- **Responsabilità:** Gestisce l'upload di file (STL/OBJ) e la loro memorizzazione.
+- **Componenti Chiave:**
+  - `services/uploader/storage.py`: Astrazione per l'accesso allo storage (inizialmente locale, futuramente S3 o simile).
+  - `services/uploader/uploader_service.py`: Logica di servizio principale per l'upload, orchestrazione della validazione e dello storage.
+  - `services/uploader/validator.py`: Modulo dedicato alla validazione dei file (es. tipo MIME, dimensioni, integrità).
+- **Test:** La logica di test sarà contenuta in `tests/uploader/` (es. `tests/uploader/test_uploader.py`).
+
+### 2. Webhook PoC (Proof of Concept)
+- **Responsabilità:** Implementa un piccolo server FastAPI secondario per ricevere callback (es. notifica di slicing completato).
+- **Componenti Chiave:**
+  - `services/webhook/router.py`: Definisce gli endpoint FastAPI per i webhook.
+  - `services/webhook/handler.py`: Contiene la logica specifica per processare le richieste in arrivo ai webhook.
+
+### 3. Rate-limit e Redis
+- **Responsabilità:** Fornisce l'infrastruttura per il rate limiting e l'integrazione con Redis.
+- **Componenti Chiave:**
+  - `infra/docker-compose.redis.yml`: File di configurazione Docker Compose per avviare un'istanza di Redis.
+  - `services/redis/redis_client.py`: Wrapper Python per interagire con il client Redis (connessione, comandi base).
+  - `utils/ratelimit.py`: Contiene il decoratore `@rate_limit` (placeholder iniziale) per applicare il rate limiting agli endpoint o funzioni.
+
+### 4. CLI/Test script
+- **Responsabilità:** Script per testare manualmente l'endpoint dell'uploader.
+- **Componenti Chiave:**
+  - `scripts/test_builder_upload.py`: Script Python che utilizza HTTPX per inviare una richiesta POST all'endpoint dell'uploader e verificarne la risposta.
