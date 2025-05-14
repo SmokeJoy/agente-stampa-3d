@@ -45,7 +45,7 @@ RUN spectral --version
 RUN git --version
 # RUN redocly --version # Rimosso perché il pacchetto è stato rimosso
 
-COPY run_in_container.sh /usr/local/bin/run_in_container.sh
+COPY .devcontainer/run_in_container.sh /usr/local/bin/run_in_container.sh
 RUN chmod +x /usr/local/bin/run_in_container.sh
 
 # Copia il file requirements.txt (se esiste già, altrimenti verrà creato e copiato dopo)
@@ -59,3 +59,5 @@ COPY . .
 
 # Mantieni il container in esecuzione (opzionale, per debugging)
 # CMD ["tail", "-f", "/dev/null"] 
+
+# Configura Poetry per non creare venvs nella directory del progetto 
