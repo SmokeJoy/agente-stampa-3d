@@ -1,17 +1,140 @@
 # flake8: noqa
 """Tests for the uploader service and validator."""
 
-from unittest.mock import MagicMock
+from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
+from fastapi import status
+from fastapi.testclient import TestClient
 
 from config.upload_settings import ALLOWED_MIME_TYPES, MAX_UPLOAD_SIZE_BYTES
+from services.uploader.uploader_service import UploadResult
 from services.uploader.validator import (
     sanitize_filename,
     validate_mime,
     validate_size,
     validate_upload_file,
 )
+
+# Mock Redis client
+mock_redis = MagicMock()
+mock_redis.incr.return_value = 1
+mock_redis.expire.return_value = True
+mock_redis.ttl.return_value = 60
+
+# Mock the RedisClient and rate_limit decorator
+with (
+    patch("services.redis.redis_client.default_redis_client", mock_redis),
+    patch("utils.ratelimit.rate_limit", lambda *args, **kwargs: lambda f: f),
+):
+    # Import app after mocking Redis
+    from main import app
+
+    # Create test client
+    client = TestClient(app)
+
+
+# API Endpoint tests
+def test_upload_endpoint_success():
+    """Test successful upload to the API endpoint."""
+    # Mock the upload_file function to avoid actual file processing
+    with patch("routers.uploader.upload_file") as mock_upload:
+        # Set up return value for the mock
+        mock_result = UploadResult(
+            file_id="test-uuid",
+            filename="test_file.stl",
+            content_type="model/stl",
+            size=1024,
+            status="stored",
+            url="https://example.com/test-uuid",
+        )
+        mock_upload.return_value = mock_result
+
+        # Create a test file
+        test_file_content = b"test file content"
+
+        # Make the request
+        response = client.post(
+            "/api/v1/upload",
+            files={"file": ("test_file.stl", test_file_content, "model/stl")},
+        )
+
+        # Check response
+        assert response.status_code == status.HTTP_201_CREATED
+        data = response.json()
+        assert data["file_id"] == "test-uuid"
+        assert data["filename"] == "test_file.stl"
+        assert data["content_type"] == "model/stl"
+        assert data["size"] == 1024
+        assert data["status"] == "stored"
+        assert data["url"] == "https://example.com/test-uuid"
+
+        # Verify the upload_file function was called with the correct arguments
+        mock_upload.assert_called_once()
+
+
+def test_upload_endpoint_with_webhook():
+    """Test upload with webhook URL."""
+    with patch("routers.uploader.upload_file") as mock_upload:
+        mock_result = UploadResult(
+            file_id="test-uuid-webhook",
+            filename="test_file.stl",
+            content_type="model/stl",
+            size=1024,
+            status="stored",
+            url="https://example.com/test-uuid-webhook",
+        )
+        mock_upload.return_value = mock_result
+
+        # Make the request with webhook URL
+        response = client.post(
+            "/api/v1/upload",
+            files={"file": ("test_file.stl", b"test content", "model/stl")},
+            data={"webhook_url": "https://example.com/webhook"},
+        )
+
+        # Check response
+        assert response.status_code == status.HTTP_201_CREATED
+        data = response.json()
+        assert data["file_id"] == "test-uuid-webhook"
+
+        # Verify webhook URL was passed
+        mock_upload.assert_called_once()
+        args, kwargs = mock_upload.call_args
+        assert kwargs["webhook_url"] == "https://example.com/webhook"
+
+
+def test_upload_endpoint_max_size_override():
+    """Test upload with MAX_UPLOAD_SIZE_BYTES override."""
+    with (
+        patch("routers.uploader.upload_file") as mock_upload,
+        patch.dict("os.environ", {"MAX_UPLOAD_SIZE_BYTES": "12345"}),
+    ):
+
+        mock_result = UploadResult(
+            file_id="test-uuid-size",
+            filename="test_file.stl",
+            content_type="model/stl",
+            size=1024,
+            status="stored",
+            url="https://example.com/test-uuid-size",
+        )
+        mock_upload.return_value = mock_result
+
+        # Make the request
+        response = client.post(
+            "/api/v1/upload",
+            files={"file": ("test_file.stl", b"test content", "model/stl")},
+        )
+
+        # Check response
+        assert response.status_code == status.HTTP_201_CREATED
+
+        # Verify max_size_bytes was passed correctly
+        mock_upload.assert_called_once()
+        args, kwargs = mock_upload.call_args
+        assert kwargs["max_size_bytes"] == 12345
+
 
 # TODO: Implement actual tests once service logic is in place.
 
