@@ -76,4 +76,8 @@ detect-secrets = "1.4.0"
 profile = "black"
 
 [tool.black]
-line-length = 88 
+line-length = 88
+
+[tool.flake8]
+max-line-length = 88
+extend-ignore = "E203" 

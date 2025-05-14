@@ -102,4 +102,3 @@ Presumendo che l'ambiente Docker sia configurato correttamente e Poetry sia disp
 Sono pronto per il tuo commit GPG-signed e il push. Monitorerò attentamente l'esito del workflow GitHub Actions e riporterò il link nel logbook una volta completato.
 
 Resto a disposizione per qualsiasi ulteriore aggiustamento o chiarimento.
-

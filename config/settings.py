@@ -1,5 +1,7 @@
-from pydantic import BaseSettings
 from pathlib import Path
+
+from pydantic import BaseSettings
+
 
 class Settings(BaseSettings):
     google_client_secret_file: Path = Path("secrets/client_secret.json")
@@ -9,6 +11,7 @@ class Settings(BaseSettings):
     class Config:
         env_file = ".env"
         env_file_encoding = "utf-8"
-        extra = 'ignore'
+        extra = "ignore"
 
-settings = Settings() 
+
+settings = Settings()

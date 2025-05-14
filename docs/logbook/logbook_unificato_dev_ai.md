@@ -200,3 +200,30 @@ Inizio implementazione del micro-task "RULE-PATCH #03".
 **DETTAGLI:** Configurati `.markdownlintignore` e `.markdownlint.json` per escludere `docs/**` e gestire eccezioni. Corretti file `README.md` e `DIARIO_PERSONALE.md` (con override) per conformità. `pre-commit run markdownlint --all-files` ora esce con codice 0.
 
 ---
+
+**DATA:** 2024-07-28T12:30:00Z
+**TICKET:** LINT-CONFIG-FINALIZATION
+**ATTIVITÀ:** Finalizzazione configurazione Markdownlint e gestione ROADMAP.md.
+
+**DETTAGLI:**
+
+1.  **ROADMAP.md:**
+    *   Copiato `docs/roadmap/ROADMAP_v2.md` in `ROADMAP.md` (root del progetto).
+    *   Corretti errori MD013 (lunghezza righe) e verificato MD041 (prima riga H1) nel nuovo `ROADMAP.md`.
+    *   *File Creato:* `ROADMAP.md`
+
+2.  **Configurazione Markdownlint:**
+    *   Aggiornato `.markdownlint.json`:
+        *   Aggiunto override per `README.md` per disabilitare `MD033` (HTML inline).
+        *   Rimosso override per `DIARIO_PERSONALE.md` (file non più esistente).
+    *   Spostato `.markdownlint.json` in `.config/.markdownlint.json`.
+    *   *File Modificato:* `.config/.markdownlint.json` (precedentemente `.markdownlint.json`)
+    *   *File Eliminato:* `.markdownlint.json` (dalla root, se presente dopo la creazione in `.config`)
+
+3.  **Configurazione Pre-commit:**
+    *   Aggiornato `.pre-commit-config.yaml` per puntare l'hook `markdownlint` al nuovo percorso di configurazione: `.config/.markdownlint.json` (usando l'argomento `--config`).
+    *   *File Modificato:* `.pre-commit-config.yaml`
+
+**OBIETTIVO:** Avere `pre-commit run markdownlint --all-files` che esegua correttamente, rispettando le configurazioni e ignorando i file specificati, e che il file `ROADMAP.md` nella root sia correttamente formattato.
+
+---
