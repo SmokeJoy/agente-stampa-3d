@@ -3,16 +3,8 @@
 import os
 from typing import Optional
 
-from fastapi import (
-    APIRouter,
-    File,
-    Form,
-    HTTPException,
-    Request,
-    Response,
-    UploadFile,
-    status,
-)
+from fastapi import (APIRouter, File, Form, HTTPException, Request, Response,
+                     UploadFile, status)
 
 from config import upload_settings
 from services.uploader.uploader_service import upload_file
@@ -25,9 +17,12 @@ router = APIRouter(
 
 
 @router.post(
-    "/api/v1/upload",
+    "/upload",
     summary="Upload a 3D model file",
-    description="Upload an STL or OBJ file for 3D printing. Files are validated for type and size.",
+    description=(
+        "Upload an STL or OBJ file for 3D printing. "
+        "Files are validated for type and size."
+    ),
     response_description="File upload result with metadata and storage information",
     status_code=status.HTTP_201_CREATED,
 )
@@ -39,7 +34,9 @@ async def upload_model(
     webhook_url: Optional[str] = Form(
         None, description="Optional webhook URL to notify when processing completes"
     ),
-    max_size_bytes: Optional[int] = None,
+    max_size_bytes: Optional[int] = Form(
+        None, description="Optional override for maximum upload size in bytes"
+    ),
 ) -> dict:
     """Handle upload of 3D model files (STL, OBJ).
 
@@ -73,7 +70,7 @@ async def upload_model(
 
     try:
         # Process the upload through the service
-        result = await upload_file(
+        result = await upload_file(  # noqa: E501
             file, webhook_url=webhook_url, max_size_bytes=effective_max_size
         )
 

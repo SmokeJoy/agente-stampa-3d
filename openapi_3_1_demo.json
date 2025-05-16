@@ -1,0 +1,440 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "OpenAPI 3.1 Demo for AGENTE STAMPA 3D",
+    "version": "0.1.0",
+    "description": "A demo OpenAPI 3.1.0 spec for API endpoints, designed to test custom Spectral rules and provide a clear API contract for 3D printing job searching, calendar integration, and file upload.",
+    "contact": {
+      "name": "AGENTE STAMPA 3D Support",
+      "url": "https://project.example.com/support",
+      "email": "support@project.example.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8000",
+      "description": "Development server"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Jobs",
+      "description": "Operations related to job searching."
+    },
+    {
+      "name": "Calendar",
+      "description": "Operations related to calendar events."
+    },
+    {
+      "name": "Upload",
+      "description": "Operations related to file uploads."
+    }
+  ],
+  "security": [
+    {
+      "ApiKeyAuth": []
+    }
+  ],
+  "paths": {
+    "/api/v1/upload": {
+      "post": {
+        "summary": "Upload a 3D model file",
+        "description": "Upload an STL or OBJ file for 3D printing. Files are validated for type and size.",
+        "operationId": "uploadModel",
+        "tags": ["Upload"],
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "The 3D model file to upload (STL, OBJ)"
+                  },
+                  "webhook_url": {
+                    "type": ["string", "null"],
+                    "format": "uri",
+                    "description": "Optional webhook URL to notify when processing completes"
+                  },
+                  "max_size_bytes": {
+                    "type": ["integer", "null"],
+                    "description": "Optional override for maximum upload size in bytes",
+                    "exclusiveMinimum": 0
+                  }
+                },
+                "required": ["file"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "File upload result with metadata and storage information",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UploadResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request - file is missing or has no name",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Payload too large - file exceeds size limit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "Unsupported media type - file type not allowed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable entity - validation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests - rate limit exceeded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "headers": {
+              "X-RateLimit-Limit": {
+                "schema": {
+                  "type": "integer"
+                },
+                "description": "The rate limit ceiling for this API"
+              },
+              "X-RateLimit-Remaining": {
+                "schema": {
+                  "type": "integer"
+                },
+                "description": "The number of requests left for the time window"
+              },
+              "X-RateLimit-Reset": {
+                "schema": {
+                  "type": "integer"
+                },
+                "description": "The remaining time window in seconds"
+              }
+            }
+          },
+          "500": {
+            "description": "Server error during upload",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/searchJobs": {
+      "get": {
+        "summary": "Search for 3D printing jobs.",
+        "description": "Searches for available 3D printing jobs based on keywords, location, budget, and tags. Returns a list of matching jobs.",
+        "operationId": "searchJobs",
+        "tags": ["Jobs"],
+        "parameters": [
+          {
+            "name": "keyword",
+            "in": "query",
+            "description": "Search keyword for jobs.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "location",
+            "in": "query",
+            "description": "Location filter for jobs. Uses OpenAPI 3.1 style nullability.",
+            "schema": {
+              "type": ["string", "null"]
+            }
+          },
+          {
+            "name": "min_budget",
+            "in": "query",
+            "description": "Minimum budget for the job. Must be greater than 0.",
+            "schema": {
+                "type": "number",
+                "exclusiveMinimum": 0 
+            }
+          },
+          {
+            "name": "tags",
+            "in": "query",
+            "description": "Tags to filter jobs by. Intentionally uses a non-standard style to test array-query-param-style-explode rule.",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "style": "form",
+            "explode": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful search results.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "results": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Job"
+                      }
+                    },
+                    "count": {
+                      "type": "integer",
+                      "minimum": 0
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request parameters.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/addToCalendar": {
+      "post": {
+        "summary": "Add an event to the Google Calendar.",
+        "description": "Adds a new event to the user's Google Calendar. Requires event details such as summary, start and end times. This action is typically authenticated via OAuth 2.0 to access the user's calendar.",
+        "operationId": "addToCalendar",
+        "tags": ["Calendar"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CalendarEvent"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Event successfully added to calendar.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "eventId": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "string",
+                      "example": "confirmed"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - API Key missing or invalid.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation error for request body.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "UploadResult": {
+        "type": "object",
+        "properties": {
+          "file_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Unique identifier for the uploaded file"
+          },
+          "filename": {
+            "type": "string",
+            "description": "Sanitized filename"
+          },
+          "content_type": {
+            "type": "string",
+            "description": "MIME type of the file",
+            "examples": ["model/stl", "model/obj", "application/sla"]
+          },
+          "size": {
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "description": "Size of the file in bytes"
+          },
+          "status": {
+            "type": "string",
+            "description": "Status of the upload",
+            "example": "stored"
+          },
+          "url": {
+            "type": "string",
+            "format": "uri",
+            "description": "URL to access the uploaded file"
+          }
+        },
+        "required": ["file_id", "filename", "content_type", "size", "status", "url"]
+      },
+      "Job": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": ["string", "null"]
+          },
+          "budget": {
+            "type": "number",
+            "format": "float",
+            "exclusiveMinimum": 10,
+            "description": "Budget must be strictly greater than 10. Tests exclusive-minimum-numeric."
+          },
+          "max_payout":{
+            "type": "number",
+            "exclusiveMaximum": 1000,
+            "description": "Payout must be strictly less than 1000. Tests exclusive-maximum-numeric."
+          }
+        }
+      },
+      "CalendarEvent": {
+        "type": "object",
+        "required": [
+          "summary",
+          "startDateTime",
+          "endDateTime"
+        ],
+        "properties": {
+          "summary": {
+            "type": "string",
+            "example": "3D Print Job Review"
+          },
+          "description": {
+            "type": ["string", "null"],
+            "example": "Review the final 3D print for client X."
+          },
+          "startDateTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "endDateTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "attendees": {
+            "items": {
+              "type": "string",
+              "format": "email"
+            },
+            "type": ["array", "null"],
+            "description": "List of attendee email addresses. Uses OpenAPI 3.1 style nullability."
+          }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "An application-specific error code.",
+            "example": "VALIDATION_ERROR"
+          },
+          "message": {
+            "type": "string",
+            "description": "A human-readable error message.",
+            "example": "The request data is invalid."
+          },
+          "details": {
+            "type": ["object", "null"],
+            "description": "Additional details about the error.",
+            "additionalProperties": true
+          }
+        },
+        "required": ["message"]
+      }
+    },
+    "securitySchemes": {
+      "ApiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-API-Key",
+        "description": "API key authentication. Provide your key in the X-API-Key header."
+      }
+    }
+  }
+} 

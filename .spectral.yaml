@@ -1,1 +1,69 @@
-# Spectral ruleset stub - Agente Stampa 3D\n# Questo file verrà popolato con regole specifiche durante il checkpoint G4.\n\nextends: spectral:oas\n\nrules:\n  # Esempio di regola (può essere rimossa o modificata in G4)\n  oas3-unused-component:\ off\n
+# Spectral ruleset - Agente Stampa 3D
+# Regole personalizzate per OpenAPI 3.1
+
+extends: spectral:oas
+
+formats: ["oas3_1"]
+
+rules:
+  # Disattivazione di regole che potrebbero entrare in conflitto con OpenAPI 3.1
+  oas3-unused-component: off
+  no-$ref-siblings: off
+  
+  # Regole personalizzate per OpenAPI 3.1
+  no-legacy-nullable:
+    description: "Evita l'uso di 'nullable: true' deprecato, preferendo type: ['type', 'null']."
+    message: "La proprietà '{{property}}' usa 'nullable: true'. OpenAPI 3.1.0 preferisce type: [..., \"null\"]."
+    given: "$..[?(@.nullable === true)]"
+    severity: warn
+    then:
+      function: falsy
+  
+  require-operationid:
+    description: "Ogni operazione API deve avere un operationId definito e non vuoto."
+    message: "L'operazione {{path}} deve avere un 'operationId' univoco e non vuoto."
+    given: "$.paths.*[get,post,put,delete,patch,options,head,trace]"
+    then:
+      field: "operationId"
+      function: truthy
+    severity: error
+  
+  exclusive-minimum-numeric:
+    description: "Assicura che exclusiveMinimum sia un numero (come da OpenAPI 3.1.0) e non un booleano."
+    message: "'exclusiveMinimum' per '{{property}}' deve essere un valore numerico in OpenAPI 3.1.0."
+    given: "$..[?(@.exclusiveMinimum !== undefined)]"
+    then:
+      field: "exclusiveMinimum"
+      function: schema
+      functionOptions:
+        schema:
+          type: "number"
+    severity: error
+  
+  exclusive-maximum-numeric:
+    description: "Assicura che exclusiveMaximum sia un numero e non un booleano."
+    message: "'exclusiveMaximum' per '{{property}}' deve essere un valore numerico in OpenAPI 3.1.0."
+    given: "$..[?(@.exclusiveMaximum !== undefined)]"
+    then:
+      field: "exclusiveMaximum"
+      function: schema
+      functionOptions:
+        schema:
+          type: "number"
+    severity: error
+  
+  array-query-param-style-explode:
+    description: "Valida che i parametri di query di tipo array usino style: form e explode: true."
+    message: "I parametri di query di tipo array ('{{property}}') dovrebbero usare 'style: form' e 'explode: true'."
+    given: "$.paths.*.*.parameters.*[?(@.in === 'query' && @.schema && @.schema.type === 'array')]"
+    then:
+      function: schema
+      functionOptions:
+        schema:
+          properties:
+            style:
+              const: "form"
+            explode:
+              const: true
+          required: ["style", "explode"]
+    severity: warn

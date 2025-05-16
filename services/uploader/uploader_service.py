@@ -4,9 +4,14 @@ This module implements the core business logic for the uploader service,
 orchestrating the validation, storage, and webhook notification steps.
 """
 
-import json
+# TODO: [G8] Implementare la logica di retry per le notifiche webhook
+# - Aggiungere un sistema di coda per i webhook falliti
+# - Implementare un backoff esponenziale per i retry
+# - Gestire stati persistenti dei tentativi di notifica
+# - Aggiungere un endpoint di callback per verificare lo stato
+
 import uuid
-from typing import Dict, Optional, Tuple
+from typing import Dict, Optional
 
 import requests  # Uso requests invece di httpx per la compatibilità
 from fastapi import HTTPException, UploadFile
