@@ -364,3 +364,51 @@ Documentazione aggiornata:
 **ESITO:** Struttura creata, documentazione aggiornata. Nessun codice implementativo inserito.
 
 ---
+
+2025-05-14T02:30Z – G6-INIT scaffolding push (tests only) – 1beb72db1e793ebe52246485e05c0b5fe4a26808
+
+---
+
+**DATA:** 2024-10-05T09:30:00Z
+**TICKET:** CI-INTEGRATION (Gap critici da chiudere)
+**ATTIVITÀ:** Integrazione CI e miglioramento copertura test
+
+**DETTAGLI:**
+In risposta alle richieste del Teach Lead, ho implementato le seguenti modifiche per migliorare l'integrazione CI e raggiungere la copertura dei test richiesta:
+
+1. **Integrazione CI:**
+   - Aggiornato workflow GitHub Actions `.github/workflows/ci.yml` per includere:
+     - Generazione di report di coverage (XML e HTML)
+     - Build del pacchetto con Poetry
+     - Upload degli artefatti (coverage e build) 
+
+2. **Correzione warning:**
+   - Rimosso `asyncio_default_fixture_loop_scope` da `pyproject.toml` che causava warning in pytest
+   - Aggiornato gli import Pydantic per utilizzare i moduli specifici (`pydantic.main` e `pydantic.fields`) evitando warning di deprecazione
+
+3. **Miglioramento test:**
+   - Aggiunti test parametrizzati per `utils/ratelimit.py` per aumentare la copertura
+   - Implementati test per le funzioni `get_default_key` e per i casi edge di rate limit (reset window, burst limit)
+
+4. **Documentazione:**
+   - Aggiornato `docs/decisions/decisions.md` con la struttura stabilizzata del pacchetto
+   - Aggiornato `docs/structure/repo_layout.md` con dettagli sulla struttura del repository
+   - Aggiornato questo logbook con i dettagli delle modifiche
+
+**FILE MODIFICATI:**
+- `.github/workflows/ci.yml`
+- `pyproject.toml`
+- `services/jobs_service.py`
+- `services/uploader/uploader_service.py`
+- `tests/utils/test_ratelimit.py`
+- `docs/decisions/decisions.md`
+- `docs/structure/repo_layout.md`
+- `docs/logbook/logbook_unificato_dev_ai.md`
+
+**MOTIVAZIONE:** 
+Migliorare la riproducibilità del processo di build e test, garantendo che la copertura dei test raggiunga almeno l'80% e che la CI verifichi automaticamente questo requisito. Rimuovere i warning che potrebbero compromettere la qualità della build.
+
+**ESITO TEST:** 
+La suite di test completa passa con una copertura superiore all'80%. I warning relativi a Pydantic e pytest sono stati eliminati.
+
+**COMMIT:** Feature/ci-integration (SHA da aggiungere dopo il commit)

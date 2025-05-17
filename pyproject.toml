@@ -2,83 +2,118 @@
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
-[project]
-name = "agente-stampa-3d"
-version = "0.1.0"
-description = "API backend per il GPT Assistente Lavori Stampa 3D"
-authors = [
-    { name = "Dev AI", email = "dev.ai@example.com" }, # Formato PEP 621
-]
-readme = "README.md"
-requires-python = ">=3.11,<3.13"
-
-# Dipendenze principali del progetto (PEP 621)
-dependencies = [
-    "fastapi==0.110.2",
-    "uvicorn[standard]==0.29.0",
-    "pydantic==2.7.1",
-    "google-api-python-client==2.120.0",
-    "google-auth-oauthlib==1.2.0",
-    "google-auth-httplib2==0.2.0",
-    "httplib2==0.22.0",
-    "python-graphql-client==0.4.3",
-    "redis==5.0.4",
-]
-
-# [project.optional-dependencies]
-# Altre dipendenze opzionali se necessario
-
-# Classificatori opzionali, possono essere utili
-# classifiers = [
-#     "Programming Language :: Python :: 3",
-#     "License :: OSI Approved :: MIT License", # Sostituisci con la tua licenza
-#     "Operating System :: OS Independent",
-# ]
-
-# Keywords opzionali
-# keywords = ["fastapi", "gpt", "3d-printing", "api"]
-
-# URL opzionali del progetto
-# [project.urls]
-# "Homepage" = "https://github.com/your-username/agente-stampa-3d"
-# "Bug Tracker" = "https://github.com/your-username/agente-stampa-3d/issues"
-
 [tool.poetry]
 name = "agente-stampa-3d"
 version = "0.1.0"
-description = "API backend per il GPT Assistente Lavori Stampa 3D"
-authors = ["Dev AI <dev.ai@example.com>"] # Formato classico di Poetry
+description = "Agente AI per la gestione di una stampante 3D, con funzionalità di ricerca, calendario e upload."
+authors = ["Dev AI <dev.ai@example.com>"]
+license = "MIT"
+readme = "README.md"
+homepage = "https://github.com/SmokeJoy/agente-stampa-3d"
+repository = "https://github.com/SmokeJoy/agente-stampa-3d"
+keywords = ["ai", "3d-printing", "fastapi", "raspberry-pi", "google-api"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Operating System :: OS Independent",
+    "Topic :: Scientific/Engineering :: Interface Engine/Protocol Translator",
+    "Topic :: Software Development :: Libraries :: Application Frameworks"
+]
+packages = [
+    { include = "services" },
+    { include = "routers" },
+    { include = "utils" },
+    { include = "config" },
+]
 
-# Dipendenze e specifica Python per [tool.poetry]
 [tool.poetry.dependencies]
-python = ">=3.11,<3.13" # Allineato con [project] e Dockerfile
-fastapi = "0.110.2"
-uvicorn = {extras = ["standard"], version = "0.29.0"}
-pydantic = "2.7.1"
-google-api-python-client = "2.120.0"
-google-auth-oauthlib = "1.2.0"
-google-auth-httplib2 = "0.2.0"
-httplib2 = "0.22.0"
-python-graphql-client = "0.4.3"
-redis = "5.0.4"
+python = ">=3.10,<3.13"
+fastapi = "^0.110.2"
+uvicorn = {extras = ["standard"], version = "^0.29.0"}
+pydantic = "^2.7.1"
+google-api-python-client = "^2.120.0"
+google-auth-oauthlib = "^1.2.0"
+google-auth-httplib2 = "^0.2.0"
+httplib2 = "^0.22.0"
+# python-graphql-client = "^0.4.3"  # da verificare se ancora usato
+redis = "^5.0.4"
+pydantic-settings = "^2.0.0"
 
-# Le dipendenze di sviluppo rimangono qui
 [tool.poetry.group.dev.dependencies]
-pytest = "8.1.1"
-pytest-mock = "3.14.0"
-pre-commit = "3.7.0"
-black = "24.4.2"
-isort = "5.13.2"
-flake8 = "7.0.0"
-detect-secrets = "1.4.0"
+black = "^25.1.0"
+mypy = "^1.8.0"
+pytest = "^8.0.0"
+pytest-asyncio = "^0.23.5"
+pytest-cov = "^4.1.0"
+pytest-mock = "^3.12.0"
+fakeredis = "^2.20.0"
+pyproject-flake8 = "^6.1.0"
+coverage = "^7.4.1"
+respx = "^0.20.2"
 
-[tool.isort]
-profile = "black"
+[tool.ruff]
+line-length = 88
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "C90", "N", "UP", "S", "B", "A", "DTZ", "TID", "FIX", "Q"]
+ignore = [
+  "B008",
+  "S101"
+]
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401"]
+"tests/*" = ["S101"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+addopts = "-ra -q --cov --cov-report=html --cov-report=xml"
+testpaths = ["tests"]
+python_files = "test_*.py"
+python_classes = "Test*"
+python_functions = "test_*"
+asyncio_mode = "auto"
+
+[tool.coverage.run]
+source = ["services", "utils", "config"]
+branch = true
+omit = [
+    "*/__init__.py",
+    "tests/*",
+    ".venv/*",
+    "*/main.py"
+]
+
+[tool.coverage.report]
+fail_under = 70
+show_missing = true
+exclude_lines = [
+    "pragma: no cover",
+    "if __name__ == .__main__.:",
+    "raise NotImplementedError",
+    "pass",
+    "def __repr__",
+    "def __str__"
+]
 
 [tool.black]
 line-length = 88
+target-version = ['py310', 'py311', 'py312']
+include = '\.pyi?$'
 
 [tool.flake8]
-max-line-length = 88
-extend-ignore = "E203" 
- 
+max-line-length = 120
+exclude = ".git,__pycache__,docs/,*.egg,build,data,venv,.venv,.pytest_cache"
+ignore = "E203, W503"
+per-file-ignores = [
+    "__init__.py:F401",
+]

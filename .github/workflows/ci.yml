@@ -35,8 +35,28 @@ jobs:
             poetry install --no-interaction --no-root
             echo "Running pre-commit hooks..."
             pre-commit run --all-files --show-diff-on-failure
-            echo "Running tests with Pytest..."
-            pytest -q tests/
+            echo "Running tests with Pytest and generating coverage reports..."
+            pytest -q --cov=agente_stampa_3d --cov-report=xml --cov-report=html tests/
+            echo "Building package..."
+            poetry build
+            echo "Testing installation from built package..."
+            pip install dist/*.whl --force-reinstall
+            
+      - name: Upload test coverage reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-coverage-reports
+          path: |
+            coverage.xml
+            htmlcov/
+            
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifacts
+          path: |
+            dist/*.whl
+            dist/*.tar.gz
 
   gpg-signature-check:
     name: GPG Signature Check

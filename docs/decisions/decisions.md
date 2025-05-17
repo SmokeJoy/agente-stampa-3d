@@ -25,3 +25,22 @@ Qui verranno documentate le decisioni significative prese durante lo sviluppo de
 - **Conferma Migrazione a Poetry**: La migrazione a Poetry è stata finalizzata e tutti i file di configurazione (pyproject.toml, Dockerfile, devcontainer.json, CI workflow) sono stati allineati per utilizzare Poetry come unico gestore delle dipendenze. Questo include il pinning esatto delle versioni come da specifiche.
 - **Validazione Strumenti CI/CD**: La configurazione per pre-commit, linting, formatting, test e GPG signature check è stata completata e verificata (a livello di configurazione). L'effettiva esecuzione e il passaggio "verde" della pipeline CI sono il prossimo passo di validazione dopo il push.
 - **Struttura Progetto Stabile per G2**: Tutti i deliverable richiesti per il checkpoint G2 sono stati implementati. Il progetto ha una base solida per le fasi successive (G4 e oltre).
+
+## Decisione: Stabilizzazione della Struttura del Pacchetto
+
+**Data:** 2024-10-04
+
+**Contesto:** È necessario stabilizzare la struttura del pacchetto per consentire una build riproducibile e l'integrazione con CI/CD.
+
+**Decisione:** Il pacchetto è stato organizzato secondo una struttura modulare con i seguenti componenti principali:
+- `services/`: Contiene i servizi core dell'applicazione, ciascuno in un modulo separato
+- `routers/`: Definisce gli endpoint FastAPI e le rotte dell'applicazione
+- `utils/`: Funzioni di utilità riusabili come il rate limiting
+- `config/`: Configurazioni centralizzate dell'applicazione
+
+**Conseguenze:**
+- Struttura più chiara e modulare che facilita la manutenzione
+- Build riproducibile tramite Poetry
+- Integrazione semplificata con CI/CD
+- Test più focalizzati e coerenti con la struttura del pacchetto
+- Coverage minima stabilita al 80% per garantire la qualità del codice

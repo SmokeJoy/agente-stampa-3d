@@ -75,3 +75,56 @@ agente-stampa-3D/
 - **`utils/`**: Contiene moduli Python con funzioni di utilità generale, decoratori, o classi helper che possono essere riutilizzate in diverse parti del progetto.
 
 L'utilizzo di `poetry` per la gestione delle dipendenze e del packaging è centrale, con `pyproject.toml` e `poetry.lock` che definiscono e bloccano le dipendenze del progetto.
+
+## Struttura del Repository
+
+La struttura del repository è organizzata secondo un approccio modulare che favorisce la separazione delle responsabilità, la manutenibilità e la testabilità.
+
+### Directory Principali
+
+- **`config/`**: Contiene le configurazioni centralizzate dell'applicazione, incluse le impostazioni per upload, rate limiting e autenticazione.
+
+- **`services/`**: Implementa la logica di business dell'applicazione, suddivisa in moduli funzionali:
+  - `services/uploader/`: Servizio per l'upload di file 3D
+  - `services/google_calendar/`: Integrazione con Google Calendar
+  - `services/redis/`: Client e funzionalità Redis
+  - `services/webhook/`: Gestione delle notifiche webhook
+
+- **`routers/`**: Definisce gli endpoint FastAPI e le rotte dell'applicazione.
+
+- **`utils/`**: Funzioni e strumenti di utilità riutilizzabili in tutto il progetto:
+  - `utils/ratelimit.py`: Implementazione del rate limiting
+
+- **`tests/`**: Test unitari e di integrazione, organizzati per rispecchiare la struttura del progetto.
+
+- **`docs/`**: Documentazione del progetto, organizzata per argomento.
+
+- **`evidence/`**: Contiene log, risultati dei test e artefatti di build per la tracciabilità e la riproducibilità:
+  - `evidence/build/`: Log e artefatti delle build
+  - `evidence/tests/`: Risultati e report dei test
+  - `evidence/logs/`: Log di esecuzione
+
+### Directory di Supporto
+
+- **`.github/workflows/`**: Pipeline CI/CD per automazione di test, build e deploy.
+- **`.devcontainer/`**: Configurazione del dev container per ambiente di sviluppo consistente.
+- **`.config/`**: Configurazioni specifiche per l'ambiente di sviluppo.
+
+### File Chiave
+
+- **`pyproject.toml`**: Definizione del pacchetto Python, dipendenze e configurazione degli strumenti di sviluppo (Poetry).
+- **`main.py`**: Punto di ingresso dell'applicazione FastAPI.
+- **`.pre-commit-config.yaml`**: Configurazione hook pre-commit per garantire qualità del codice.
+- **`.spectral.yaml`**: Regole di linting per OpenAPI 3.1.
+
+### Organizzazione dei Test
+
+I test seguono una struttura speculare al codice sorgente, facilitando l'associazione tra test e implementazione:
+
+```
+tests/
+├── integration/  # Test di integrazione end-to-end
+├── uploader/     # Test del modulo uploader
+└── utils/        # Test delle utility
+    └── test_ratelimit.py  # Test per utils/ratelimit.py
+```

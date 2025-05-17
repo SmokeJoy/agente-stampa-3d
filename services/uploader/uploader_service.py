@@ -14,8 +14,8 @@ import uuid
 from typing import Dict, Optional
 
 import requests  # Uso requests invece di httpx per la compatibilità
-from fastapi import HTTPException, UploadFile
-from pydantic import BaseModel
+from fastapi import HTTPException, UploadFile, status
+from pydantic.main import BaseModel
 
 from config import upload_settings
 from services.uploader.storage import StorageBackend, default_storage
@@ -55,13 +55,12 @@ async def upload_file(
     Raises:
         HTTPException: If validation fails or storage errors occur
     """
-    # Validate the file
-    is_valid, error_msg, sanitized_name, file_size, mime_type = (
-        await validate_upload_file(file, allowed_mimes, max_size_bytes)
+    # Validate the file - lancia HTTPException se il file non è valido
+    validated_file = await validate_upload_file(
+        file,
+        allowed_mimes,
+        max_size_bytes,
     )
-
-    if not is_valid:
-        raise HTTPException(status_code=422, detail=error_msg)
 
     # Generate a unique file ID
     file_id = str(uuid.uuid4())
@@ -76,9 +75,9 @@ async def upload_file(
         # Create the result
         result = UploadResult(
             file_id=saved_file_id,
-            filename=sanitized_name or file.filename,
-            content_type=mime_type,
-            size=file_size,
+            filename=validated_file.sanitized_filename,
+            content_type=validated_file.mime_type,
+            size=validated_file.size,
             status="stored",
             url=file_url,
         )
@@ -92,7 +91,10 @@ async def upload_file(
     except Exception as e:
         # Log the error (this would use a proper logger in production)
         print(f"Error storing file: {str(e)}")
-        raise HTTPException(status_code=500, detail="Error storing file") from e
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Error storing file",
+        ) from e
 
 
 def notify_webhook(webhook_url: str, data: Dict) -> bool:
