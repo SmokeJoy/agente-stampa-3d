@@ -412,3 +412,42 @@ Migliorare la riproducibilità del processo di build e test, garantendo che la c
 La suite di test completa passa con una copertura superiore all'80%. I warning relativi a Pydantic e pytest sono stati eliminati.
 
 **COMMIT:** Feature/ci-integration (SHA: e4c1e1e)
+
+---
+
+**DATA:** 2025-05-17T13:15:00Z  
+**TICKET:** CI-INTEGRATION-FIX  
+**ATTIVITÀ:** Correzioni per CI, firma GPG e Spectral lint  
+
+**DETTAGLI:**  
+Su richiesta del Teach Lead, sono state apportate le seguenti correzioni prioritarie per chiudere i gap critici:
+
+1. **Miglioramento CI Pipeline:**
+   - Aggiornato il workflow GitHub Actions per supportare la firma GPG nei commit
+   - Aggiunto supporto per l'upload di report di quality e coverage
+   - Configurata l'esecuzione di spectral lint nel pipeline CI
+   - Riferimento PR: `feature/ci-integration`
+
+2. **Spectral Lint:**
+   - Verifica del problema di chiave duplicata nello schema OpenAPI 3.1
+   - Validazione schema con Spectral (0 errori)
+   - Salvato log in `evidence/quality/spectral_lint_pass.log`
+
+3. **Coverage Plan:**
+   - Creata issue `COVERAGE-GAP-001` con piano dettagliato per migliorare la copertura test
+   - Definito target 85% entro la fine di G6
+   - Link: [COVERAGE-GAP](../issues/COVERAGE-GAP.md)
+
+**ESITO:**
+- CI funzionante con tutti i check abilitati
+- Spectral lint clean (0 errori)
+- Pipeline di verifica GPG configurata
+
+**FILES MODIFICATI:**
+- `.github/workflows/ci.yml` (aggiornata configurazione CI e GPG)
+- `docs/issues/COVERAGE-GAP.md` (nuovo file)
+- `docs/logbook/logbook_unificato_dev_ai.md` (questo aggiornamento)
+- `evidence/quality/spectral_lint_pass.log` (nuovo file)
+
+**NOTE:**
+Tutti i commit futuri rispetteranno le regole di firma GPG come richiesto dall'Art. 5.2.

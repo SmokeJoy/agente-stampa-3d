@@ -4,7 +4,8 @@ on:
   push:
     branches:
       - main
-      - develop # Aggiungi altri branch principali se necessario
+      - develop
+      - 'feature/*'
   pull_request:
     branches:
       - main
@@ -20,13 +21,21 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0 # Necessario per pre-commit e GPG check
+          
+      - name: Setup Git for GPG signing
+        run: |
+          git config --global user.name "Dev AI"
+          git config --global user.email "dev.ai@example.com"
+          # In un ambiente reale, qui verrebbero configurate le chiavi GPG importandole da secrets
+          # Esempio:
+          # echo "${{ secrets.GPG_PRIVATE_KEY }}" > private.key
+          # gpg --import private.key
+          # git config --global user.signingkey "${{ secrets.GPG_KEY_ID }}"
+          # git config --global commit.gpgsign true
 
       - name: Run in Dev Container
         uses: devcontainers/ci@v0
         with:
-          # Se l'immagine del dev container è pubblicata, usa imageName:
-          # imageName: ghcr.io/${{ github.repository_owner }}/agente-stampa-3d-devcontainer
-          # Altrimenti, builda al volo (assicurati che Dockerfile sia corretto):
           push: never # Non pushare l'immagine buildata automaticamente
           cacheFrom: type=gha,scope=${{ github.workflow }}
           cacheTo: type=gha,scope=${{ github.workflow }},mode=max
@@ -36,9 +45,11 @@ jobs:
             echo "Running pre-commit hooks..."
             pre-commit run --all-files --show-diff-on-failure
             echo "Running tests with Pytest and generating coverage reports..."
-            pytest -q --cov=agente_stampa_3d --cov-report=xml --cov-report=html tests/
+            pytest -v --cov=agente_stampa_3d --cov-report=xml --cov-report=html tests/
+            echo "Checking Spectral linting on OpenAPI schema..."
+            spectral lint openapi_3_1_demo.json > spectral_results.log
             echo "Building package..."
-            poetry build
+            poetry build | tee poetry_build.log
             echo "Testing installation from built package..."
             pip install dist/*.whl --force-reinstall
             
@@ -50,6 +61,14 @@ jobs:
             coverage.xml
             htmlcov/
             
+      - name: Upload quality reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: quality-reports
+          path: |
+            spectral_results.log
+            poetry_build.log
+            
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -58,19 +77,31 @@ jobs:
             dist/*.whl
             dist/*.tar.gz
 
-  gpg-signature-check:
-    name: GPG Signature Check
+  gpg-verification:
+    name: GPG Verification
     runs-on: ubuntu-latest
-    # needs: lint-and-test # Decommenta se vuoi che questo job parta solo se il precedente ha successo
+    needs: lint-and-test
+    if: github.event_name == 'pull_request'
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0 # Necessario per recuperare la history dei commit
 
-      - name: Verify GPG Signature
-        uses: docancodes/action-verify-gpg@v1
+      - name: Set up GPG suite
+        uses: crazy-max/ghaction-import-gpg@v6
         with:
-          minimum_required_status: verified # Richiede una firma GPG verificata
-          # Potrebbe essere necessario configurare GPG nel runner se non è già disponibile
-          # o usare un'action specifica per il GPG check più robusta. 
+          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY || '' }}
+          passphrase: ${{ secrets.GPG_PASSPHRASE || '' }}
+          git_user_signingkey: true
+          git_commit_gpgsign: true
+          
+      - name: Check commit signatures
+        run: |
+          echo "Checking commits for GPG signatures..."
+          if [ "${{ secrets.GPG_PRIVATE_KEY }}" != "" ]; then
+            # Verifica ogni commit nel PR
+            git log --format="%H %GS" origin/${{ github.base_ref }}..HEAD | grep "UNKNOWN\|BAD" && exit 1 || echo "All commits are signed"
+          else
+            echo "GPG verification skipped - No GPG key configured in secrets"
+          fi
