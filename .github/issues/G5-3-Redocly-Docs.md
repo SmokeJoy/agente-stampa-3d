@@ -17,31 +17,26 @@ per fornire una documentazione interattiva, esteticamente gradevole e sempre agg
 
 1. Setup iniziale:
    - [ ] Installare e configurare `@redocly/cli` come dipendenza di sviluppo
-   - [ ] Creare file di configurazione `redocly.yaml` nella root del progetto
-   - [ ] Definire lo stile e le opzioni di personalizzazione della documentazione
+   - [ ] Creare file di configurazione `redocly.yaml` nel root del progetto
+   - [ ] Testare la generazione HTML locale
 
-2. Integrazione con OpenAPI 3.1:
-   - [ ] Verificare la compatibilità di Redocly con le funzionalità di OpenAPI 3.1
-   - [ ] Configurare il rendering delle estensioni custom `x-internal` e `x-risk`
-   - [ ] Assicurare che la validazione di Redocly non interferisca con il dialect personalizzato
+2. Integrazione CI:
+   - [ ] Aggiungere step nel workflow GitHub Actions
+   - [ ] Configurare cache per le dipendenze npm
+   - [ ] Salvare output HTML come artefatto della pipeline
 
-3. Integrazione CI:
-   - [ ] Aggiungere step nel workflow CI per generare la documentazione HTML
-   - [ ] Configurare l'archiviazione della documentazione come artefatto della pipeline
-   - [ ] Implementare un meccanismo di deploy automatico (opzionale)
-
-4. Miglioramenti alla documentazione:
-   - [ ] Aggiungere esempi realistici per ogni endpoint
-   - [ ] Migliorare le descrizioni di campi e parametri
-   - [ ] Organizzare gli endpoint in gruppi logici con tag appropriati
+3. Personalizzazione:
+   - [ ] Configurare tema e stile
+   - [ ] Migliorare esempi API
+   - [ ] Aggiungere guide d'uso
+   - [ ] Rendere visibili le estensioni custom (x-internal, x-risk)
 
 ## Definition of Done
 
-- [ ] Documentazione HTML generata automaticamente ad ogni push
-- [ ] Estensioni custom visualizzate correttamente nella documentazione
-- [ ] Artefatto di documentazione disponibile per il download nelle esecuzioni CI
-- [ ] Feedback positivo dal team sulla qualità e usabilità della documentazione
-- [ ] Procedura documentata nel logbook
+- [ ] Documentazione HTML generata con successo durante la CI
+- [ ] Artefatti HTML disponibili per ogni build di PR
+- [ ] Rendering corretto di tutte le operazioni API
+- [ ] Visualizzazione corretta delle estensioni custom
 
 ## Assignee
 
@@ -49,7 +44,7 @@ per fornire una documentazione interattiva, esteticamente gradevole e sempre agg
 
 ## Priority
 
-Media (dopo G5-1 e G5-2)
+Media (dipendenza da G5-1 e G5-2)
 
 ## Related
 

@@ -14,26 +14,22 @@ che estende le funzionalità standard di OpenAPI 3.1 con parole chiave custom ne
   - [x] `x-risk` (enum) per indicare il livello di rischio di sicurezza/affidabilità
 - [x] Impostare un `$id` univoco con URI del repository raw
 - [x] Creare test per validare lo schema dialect con `jsonschema`
+- [x] Integrare il test in CI
 
 ## Implementazione
 
-1. Definizione del dialect con supporto per:
-   - Validazione struttura OpenAPI 3.1.0
-   - Estensioni custom `x-internal` e `x-risk`
-   - Pattern per `operationId` in camelCase
-
-2. Test di validazione:
-   - Creazione di test in `tests/spec/test_schema_dialect.py`
-   - Verifica che il dialect sia valido
-   - Verifica che il dialect contenga le keyword custom
-   - Verifica che lo schema OpenAPI 3.1 sia valido secondo il dialect
+1. Verifica RFC JSON Schema 2020-12 per struttura corretta
+2. Includi tutte le parole chiave richieste nel dialect
+3. Implementa unit test con jsonschema per validare sia il dialect che lo schema OpenAPI
+4. Aggiungi jsonschema come dipendenza in poetry
 
 ## Definition of Done
 
-- [x] File `mif_jsonschema_dialect.json` creato e popolato correttamente
-- [x] Test `tests/spec/test_schema_dialect.py` scritto e passante
-- [x] Schema OpenAPI esistente convalidato con successo contro il dialect
-- [x] Documentato nel logbook
+- [x] Il dialect è definito con `$schema` e `$id` corretti
+- [x] Il dialect include le keywords custom
+- [x] Il test `tests/spec/test_schema_dialect.py` verifica correttamente il dialect
+- [x] Commit firmato GPG con messaggio descrittivo
+- [x] Documentazione nel logbook e nel decision record
 
 ## Assignee
 
@@ -41,7 +37,7 @@ che estende le funzionalità standard di OpenAPI 3.1 con parole chiave custom ne
 
 ## Priority
 
-Alta (blocca gli altri task G5)
+Alta (blocca tutti gli altri task della feature G5)
 
 ## Related
 

@@ -1,0 +1,311 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/SmokeJoy/agente-stampa-3d/main/mif_jsonschema_dialect.json",
+  "title": "MIF JSON Schema Dialect for OpenAPI 3.1",
+  "description": "JSON Schema dialect configuration for OpenAPI 3.1.0 validation with custom extensions for 3D printing job search API",
+  "type": "object",
+  "properties": {
+    "openapi": {
+      "type": "string",
+      "const": "3.1.0",
+      "description": "OpenAPI version must be exactly 3.1.0"
+    },
+    "jsonSchemaDialect": {
+      "type": "string",
+      "format": "uri",
+      "default": "https://spec.openapis.org/oas/3.1/dialect/base",
+      "description": "The JSON Schema dialect used for schema objects within this document"
+    },
+    "info": {
+      "type": "object",
+      "required": ["title", "version"],
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "contact": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "url": {
+              "type": "string",
+              "format": "uri"
+            },
+            "email": {
+              "type": "string",
+              "format": "email"
+            }
+          }
+        }
+      }
+    },
+    "servers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["url"],
+        "properties": {
+          "url": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name"],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "paths": {
+      "type": "object",
+      "patternProperties": {
+        "^/": {
+          "type": "object",
+          "properties": {
+            "summary": {
+              "type": "string",
+              "description": "Summary at PathItem level, new in OpenAPI 3.1.0"
+            },
+            "description": {
+              "type": "string"
+            },
+            "x-internal": {
+              "type": "boolean",
+              "description": "Custom extension to mark endpoints for internal use only"
+            }
+          },
+          "patternProperties": {
+            "^(get|put|post|delete|options|head|patch|trace)$": {
+              "type": "object",
+              "properties": {
+                "operationId": {
+                  "type": "string",
+                  "pattern": "^[a-z][a-zA-Z0-9]*$",
+                  "description": "Operation ID in camelCase format"
+                },
+                "summary": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": "string"
+                },
+                "tags": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "parameters": {
+                  "type": "array",
+                  "items": {
+                    "type": "object"
+                  }
+                },
+                "requestBody": {
+                  "type": "object"
+                },
+                "responses": {
+                  "type": "object"
+                },
+                "x-internal": {
+                  "type": "boolean",
+                  "description": "Custom extension to mark operations for internal use only"
+                },
+                "x-risk": {
+                  "type": "string",
+                  "enum": ["low", "medium", "high", "critical"],
+                  "description": "Custom extension to indicate the security or reliability risk level of the operation"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "components": {
+      "type": "object",
+      "properties": {
+        "schemas": {
+          "type": "object",
+          "patternProperties": {
+            "^[a-zA-Z0-9._-]+$": {
+              "$comment": "Schema object validation rules",
+              "type": "object",
+              "properties": {
+                "type": {
+                  "oneOf": [
+                    {
+                      "type": "string",
+                      "enum": ["string", "number", "integer", "boolean", "array", "object", "null"]
+                    },
+                    {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "enum": ["string", "number", "integer", "boolean", "array", "object", "null"]
+                      },
+                      "uniqueItems": true
+                    }
+                  ],
+                  "description": "Type can be a single string or an array of strings (for nullable types)"
+                },
+                "nullable": {
+                  "type": "boolean",
+                  "deprecated": true,
+                  "description": "Deprecated in OpenAPI 3.1.0, use type: ['type', 'null'] instead"
+                },
+                "exclusiveMinimum": {
+                  "type": "number",
+                  "description": "Must be a number in OpenAPI 3.1.0, not a boolean"
+                },
+                "exclusiveMaximum": {
+                  "type": "number",
+                  "description": "Must be a number in OpenAPI 3.1.0, not a boolean"
+                },
+                "unevaluatedProperties": {
+                  "type": "boolean",
+                  "description": "Controls whether additional, undeclared properties are allowed"
+                },
+                "x-internal": {
+                  "type": "boolean",
+                  "description": "Custom extension to mark schemas for internal use only"
+                },
+                "x-risk": {
+                  "type": "string",
+                  "enum": ["low", "medium", "high", "critical"],
+                  "description": "Custom extension to indicate the security or reliability risk level of the schema"
+                }
+              }
+            }
+          }
+        },
+        "parameters": {
+          "type": "object",
+          "patternProperties": {
+            "^[a-zA-Z0-9._-]+$": {
+              "type": "object",
+              "properties": {
+                "x-internal": {
+                  "type": "boolean",
+                  "description": "Custom extension to mark parameters for internal use only"
+                },
+                "x-risk": {
+                  "type": "string",
+                  "enum": ["low", "medium", "high", "critical"],
+                  "description": "Custom extension to indicate the security or reliability risk level of the parameter"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "type": "object",
+          "patternProperties": {
+            "^[a-zA-Z0-9._-]+$": {
+              "type": "object",
+              "properties": {
+                "x-internal": {
+                  "type": "boolean",
+                  "description": "Custom extension to mark responses for internal use only"
+                },
+                "x-risk": {
+                  "type": "string",
+                  "enum": ["low", "medium", "high", "critical"],
+                  "description": "Custom extension to indicate the security or reliability risk level of the response"
+                }
+              }
+            }
+          }
+        },
+        "securitySchemes": {
+          "type": "object",
+          "patternProperties": {
+            "^[a-zA-Z0-9._-]+$": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "enum": ["apiKey", "http", "oauth2", "openIdConnect"]
+                },
+                "description": {
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "in": {
+                  "type": "string",
+                  "enum": ["query", "header", "cookie"]
+                },
+                "scheme": {
+                  "type": "string"
+                },
+                "bearerFormat": {
+                  "type": "string"
+                },
+                "flows": {
+                  "type": "object"
+                },
+                "openIdConnectUrl": {
+                  "type": "string",
+                  "format": "uri"
+                },
+                "x-internal": {
+                  "type": "boolean",
+                  "description": "Custom extension to mark security schemes for internal use only"
+                },
+                "x-risk": {
+                  "type": "string",
+                  "enum": ["low", "medium", "high", "critical"],
+                  "description": "Custom extension to indicate the security or reliability risk level of the security scheme"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "security": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    }
+  },
+  "required": ["openapi", "info", "paths"],
+  "unevaluatedProperties": false,
+  "meta": {
+    "vocabulary": {
+      "https://raw.githubusercontent.com/SmokeJoy/agente-stampa-3d/main/mif_jsonschema_dialect.json": {
+        "x-internal": {
+          "type": "boolean"
+        },
+        "x-risk": {
+          "type": "string",
+          "enum": ["low", "medium", "high", "critical"]
+        }
+      }
+    }
+  }
+} 

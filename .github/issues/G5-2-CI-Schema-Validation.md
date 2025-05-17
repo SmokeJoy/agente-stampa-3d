@@ -17,25 +17,24 @@ sia sempre conforme al dialect definito in `mif_jsonschema_dialect.json`.
 
 1. Verifica dei test esistenti:
    - [ ] Confermare che `test_dialect_schema_is_valid` verifica la struttura del dialect
-   - [ ] Confermare che `test_dialect_contains_custom_keywords` verifica la presenza di `x-internal` e `x-risk`
-   - [ ] Confermare che `test_openapi_schema_validates_against_dialect` esegue la validazione completa
-
-2. Miglioramenti al workflow CI:
-   - [ ] Aggiornare il job `lint-and-test` per eseguire i test di dialect
-   - [ ] Aggiungere controlli di sicurezza per identificare modifiche non autorizzate al dialect
-   - [ ] Configurare la pipeline per fallire esplicitamente se la validazione fallisce
-
-3. Documentazione e reporting:
-   - [ ] Aggiornare `docs/processes/ci_pipeline.md` con i dettagli della validazione del dialect
-   - [ ] Implementare l'output di report leggibili in caso di errore
-   - [ ] Aggiornare il logbook con i dettagli dell'implementazione
+   - [ ] Confermare che `test_openapi_schema_validates_against_dialect` valida lo schema OpenAPI
+   - [ ] Aggiungere assertion più specifiche per verificare campi critici
+   
+2. Aggiornamento workflow CI:
+   - [ ] Aggiungere step dedicated nel file `.github/workflows/ci.yml`
+   - [ ] Installare dipendenze necessarie (jsonschema)
+   - [ ] Configurare output di test per diagnostica
+   
+3. Artefatti CI:
+   - [ ] Generare report di validazione leggibili
+   - [ ] Salvare report come artefatto della pipeline
 
 ## Definition of Done
 
-- [ ] Tutti i test di validazione del dialect passano nell'ambiente CI
-- [ ] Le modifiche intenzionalmente non valide causano il fallimento della pipeline
-- [ ] Documentazione aggiornata nel logbook e in `docs/processes/ci_pipeline.md`
-- [ ] Pull request approvata e mergiata
+- [ ] Pipeline CI esegue correttamente il test del dialect
+- [ ] Pipeline fallisce se lo schema non è valido
+- [ ] Report di validazione generato e salvato come artefatto
+- [ ] Documentazione aggiornata nel logbook
 
 ## Assignee
 

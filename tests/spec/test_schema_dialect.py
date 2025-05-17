@@ -1,7 +1,6 @@
 """Test per validare il dialect JSON Schema e lo schema OpenAPI 3.1."""
 
 import json
-import os
 from pathlib import Path
 
 import pytest

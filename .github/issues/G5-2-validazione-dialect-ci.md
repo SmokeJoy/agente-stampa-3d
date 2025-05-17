@@ -2,7 +2,8 @@
 
 ## Scope
 
-Integrare la validazione del dialect JSON Schema nel workflow CI per garantire che lo schema OpenAPI 3.1 sia sempre conforme al dialect definito in `mif_jsonschema_dialect.json`.
+Integrare la validazione del dialect JSON Schema nel workflow CI per garantire che lo schema OpenAPI 3.1 
+sia sempre conforme al dialect definito in `mif_jsonschema_dialect.json`.
 
 ## Obiettivi
 
@@ -43,4 +44,4 @@ Alta (dipendenza da G5-1)
 
 - G5-1: Dialect JSON Schema
 - G5-3: Documentazione HTML con Redocly
-- G5-4: Spectral Custom Rules "Gap-Fix" 
+- G5-4: Spectral Custom Rules "Gap-Fix"

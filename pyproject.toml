@@ -42,6 +42,7 @@ httplib2 = "^0.22.0"
 # python-graphql-client = "^0.4.3"  # da verificare se ancora usato
 redis = "^5.0.4"
 pydantic-settings = "^2.0.0"
+jsonschema = ">=4.22,<5"
 
 [tool.poetry.group.dev.dependencies]
 black = "^25.1.0"
