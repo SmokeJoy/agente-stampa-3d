@@ -411,7 +411,7 @@ Migliorare la riproducibilità del processo di build e test, garantendo che la c
 **ESITO TEST:** 
 La suite di test completa passa con una copertura superiore all'80%. I warning relativi a Pydantic e pytest sono stati eliminati.
 
-**COMMIT:** Feature/ci-integration (SHA: e4c1e1e)
+**COMMIT:** Feature/ci-integration (SHA: ea5b18c)
 
 ---
 
@@ -448,6 +448,7 @@ Su richiesta del Teach Lead, sono state apportate le seguenti correzioni priorit
 - `docs/issues/COVERAGE-GAP.md` (nuovo file)
 - `docs/logbook/logbook_unificato_dev_ai.md` (questo aggiornamento)
 - `evidence/quality/spectral_lint_pass.log` (nuovo file)
+- `.github/pull_requests/feature-ci-integration.md` (descrizione PR)
 
 **NOTE:**
 Tutti i commit futuri rispetteranno le regole di firma GPG come richiesto dall'Art. 5.2.
