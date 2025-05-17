@@ -411,4 +411,4 @@ Migliorare la riproducibilità del processo di build e test, garantendo che la c
 **ESITO TEST:** 
 La suite di test completa passa con una copertura superiore all'80%. I warning relativi a Pydantic e pytest sono stati eliminati.
 
-**COMMIT:** Feature/ci-integration (SHA da aggiungere dopo il commit)
+**COMMIT:** Feature/ci-integration (SHA: e4c1e1e)
