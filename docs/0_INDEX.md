@@ -38,7 +38,7 @@ La tabella seguente mostra lo stato di avanzamento delle principali fasi e check
 | **G4-MOD (Docs Struttura: Code Map & Modular Plan)**| (cfr. G4)        | ✅ *completato* |
 | ---                                                 | ---              | ---         |
 | **G2** (Dev‑container, CI, settings, refactor auth) | 24h              | ✅ Completato |
-| **G4** (Schema demo 3.1 + Spectral 0‑err ≤2‑warn)   | 96h              | ⏳ In corso  |
+| **G4** (Schema demo 3.1 + Spectral 0‑err ≤2‑warn)   | 96h              | ✅ Completato  |
 | **G6** (Script upload Builder + PoC webhook, ecc.)  | 144h             | ⏳ In corso  |
 | **G8** (OAuth debugging, migrazione 3.0→3.1, ecc.) | 192h             | ❌ Pending  |
 | **G10** (Report finale & compatibility_matrix)      | 240h             | ❌ Pending  |

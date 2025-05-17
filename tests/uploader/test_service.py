@@ -8,20 +8,22 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 import requests
-from fastapi import HTTPException, UploadFile
+from fastapi import HTTPException, UploadFile, status
 from pytest_mock import MockerFixture
 
 from config import upload_settings
 from services.uploader.storage import InMemoryStorage, StorageBackend
-from services.uploader.uploader_service import UploadResult, notify_webhook, upload_file
+from services.uploader.uploader_service import (UploadResult, notify_webhook,
+                                                upload_file)
 
 
 class MockResponse:
     """Mock per requests.Response."""
+
     def __init__(self, status_code: int = 200, json_data: Dict = None):
         self.status_code = status_code
         self.json_data = json_data or {}
-        
+
     def json(self):
         return self.json_data
 
@@ -33,17 +35,17 @@ def mock_file() -> UploadFile:
     mock_file = MagicMock(spec=UploadFile)
     mock_file.filename = "test_file.stl"
     mock_file.content_type = "model/stl"
-    
+
     async def mock_read():
         return content
-    
+
     async def mock_seek(position):
         pass
-    
+
     mock_file.read = AsyncMock(side_effect=mock_read)
     mock_file.seek = AsyncMock(side_effect=mock_seek)
     mock_file.size = len(content)
-    
+
     return mock_file
 
 
@@ -58,10 +60,10 @@ async def test_upload_file_happy_path(mock_file: UploadFile, storage: InMemorySt
     """Test successful file upload."""
     # Arrange
     file_id = str(uuid.uuid4())
-    with patch('uuid.uuid4', return_value=uuid.UUID(file_id)):
+    with patch("uuid.uuid4", return_value=uuid.UUID(file_id)):
         # Act
         result = await upload_file(mock_file, storage_backend=storage)
-        
+
         # Assert
         assert result.file_id == file_id
         assert result.filename == mock_file.filename
@@ -69,7 +71,7 @@ async def test_upload_file_happy_path(mock_file: UploadFile, storage: InMemorySt
         assert result.size == mock_file.size
         assert result.status == "stored"
         assert result.url == f"https://test-storage.example.com/{file_id}"
-        
+
         # Verify storage was called correctly
         assert file_id in storage.storage
         assert storage.storage[file_id]["filename"] == mock_file.filename
@@ -77,22 +79,21 @@ async def test_upload_file_happy_path(mock_file: UploadFile, storage: InMemorySt
 
 
 @pytest.mark.asyncio
-async def test_upload_file_with_webhook(mock_file: UploadFile, storage: InMemoryStorage, mocker: MockerFixture):
+async def test_upload_file_with_webhook(
+    mock_file: UploadFile, storage: InMemoryStorage, mocker: MockerFixture
+):
     """Test file upload with webhook notification."""
     # Arrange
     webhook_url = "https://webhook.example.com/endpoint"
     mock_notify = mocker.patch(
-        "services.uploader.uploader_service.notify_webhook", 
-        return_value=True
+        "services.uploader.uploader_service.notify_webhook", return_value=True
     )
-    
+
     # Act
     result = await upload_file(
-        mock_file, 
-        storage_backend=storage, 
-        webhook_url=webhook_url
+        mock_file, storage_backend=storage, webhook_url=webhook_url
     )
-    
+
     # Assert
     assert result.status == "stored"
     mock_notify.assert_called_once()
@@ -103,20 +104,26 @@ async def test_upload_file_with_webhook(mock_file: UploadFile, storage: InMemory
 
 
 @pytest.mark.asyncio
-async def test_upload_file_validation_failure(mock_file: UploadFile, storage: InMemoryStorage, mocker: MockerFixture):
-    """Test upload with validation failure."""
-    # Arrange
-    mocker.patch(
-        "services.uploader.uploader_service.validate_upload_file",
-        return_value=(False, "Invalid file", None, None, None)
-    )
-    
-    # Act & Assert
-    with pytest.raises(HTTPException) as excinfo:
-        await upload_file(mock_file, storage_backend=storage)
-    
-    assert excinfo.value.status_code == 422
-    assert excinfo.value.detail == "Invalid file"
+async def test_upload_file_validation_failure():
+    """Test upload_file with invalid MIME type."""
+    mock_file = MagicMock()
+    mock_file.content_type = "application/pdf"  # Invalid MIME type
+    mock_file.size = 1024
+    mock_file.filename = "test.pdf"
+
+    # Impostiamo validate_upload_file per lanciare HTTPException (come implementato adesso)
+    with patch(
+        "services.uploader.validator.validate_upload_file",
+        side_effect=HTTPException(
+            status_code=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
+            detail="MIME type not allowed",
+        ),
+    ):
+        # Verifichiamo che upload_file propaghi l'eccezione
+        with pytest.raises(HTTPException) as exc_info:
+            await upload_file(mock_file)
+
+        assert exc_info.value.status_code == status.HTTP_415_UNSUPPORTED_MEDIA_TYPE
 
 
 @pytest.mark.asyncio
@@ -125,11 +132,11 @@ async def test_upload_file_storage_error(mock_file: UploadFile, mocker: MockerFi
     # Arrange
     mock_storage = MagicMock(spec=StorageBackend)
     mock_storage.save = AsyncMock(side_effect=Exception("Storage error"))
-    
+
     # Act & Assert
     with pytest.raises(HTTPException) as excinfo:
         await upload_file(mock_file, storage_backend=mock_storage)
-    
+
     assert excinfo.value.status_code == 500
     assert excinfo.value.detail == "Error storing file"
 
@@ -139,15 +146,15 @@ def test_notify_webhook_success(mocker: MockerFixture):
     # Arrange
     webhook_url = "https://webhook.example.com/endpoint"
     data = {"file_id": "test-id", "status": "stored"}
-    
+
     # Creo il mock di requests.post prima di usarlo
     requests_post_mock = mocker.patch("requests.post")
     mock_response = MockResponse(status_code=200)
     requests_post_mock.return_value = mock_response
-    
+
     # Act
     result = notify_webhook(webhook_url, data)
-    
+
     # Assert
     assert result is True
     # Verifico che requests.post sia chiamato con i parametri corretti
@@ -155,7 +162,7 @@ def test_notify_webhook_success(mocker: MockerFixture):
         webhook_url,
         json=data,
         timeout=5.0,
-        headers={"Content-Type": "application/json"}
+        headers={"Content-Type": "application/json"},
     )
 
 
@@ -164,14 +171,14 @@ def test_notify_webhook_failure(mocker: MockerFixture):
     # Arrange
     webhook_url = "https://webhook.example.com/endpoint"
     data = {"file_id": "test-id", "status": "stored"}
-    
+
     # Mock per una risposta con codice 500
     mock_response = MockResponse(status_code=500)
     mocker.patch("requests.post", return_value=mock_response)
-    
+
     # Act
     result = notify_webhook(webhook_url, data)
-    
+
     # Assert
     assert result is False
 
@@ -181,12 +188,12 @@ def test_notify_webhook_exception(mocker: MockerFixture):
     # Arrange
     webhook_url = "https://webhook.example.com/endpoint"
     data = {"file_id": "test-id", "status": "stored"}
-    
+
     # Simulo un'eccezione durante la chiamata a requests.post
     mocker.patch("requests.post", side_effect=Exception("Connection error"))
-    
+
     # Act
     result = notify_webhook(webhook_url, data)
-    
+
     # Assert
-    assert result is False 
+    assert result is False

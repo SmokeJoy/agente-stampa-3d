@@ -1,22 +1,19 @@
-"""Storage abstraction for uploader service.
+"""Storage backend interface for uploader service.
 
-Provides a consistent interface for file storage operations.
-The `StorageBackend` class defines the interface that all storage backends must implement.
-This module also includes an in-memory implementation for testing.
+Defines a storage interface and implementation for 3D model files.
 """
 
-import abc
 import uuid
-from pathlib import Path
+from abc import ABC, abstractmethod
 from typing import Any, Dict, Optional
 
 from fastapi import UploadFile
 
 
-class StorageBackend(abc.ABC):
+class StorageBackend(ABC):
     """Abstract base class for storage backends."""
 
-    @abc.abstractmethod
+    @abstractmethod
     async def save(self, file: UploadFile, file_id: Optional[str] = None) -> str:
         """Save a file to the storage backend.
 
@@ -29,7 +26,7 @@ class StorageBackend(abc.ABC):
         """
         pass
 
-    @abc.abstractmethod
+    @abstractmethod
     def get_url(self, file_id: str) -> str:
         """Get the URL for a stored file.
 

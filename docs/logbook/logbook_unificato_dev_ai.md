@@ -517,3 +517,48 @@ Corretto l'ultimo commit della milestone G4 per garantire la corretta firma GPG,
 La milestone G4 è ora completamente chiusa con tutti i requisiti soddisfatti, inclusa la firma GPG su tutti i commit.
 
 **COMMIT:** Feature/ci-integration (SHA: 66ca2602e11ba6df01e0a48ebbce5976e80ae3db)
+
+---
+
+**DATA:** 2024-09-24T15:30:00Z
+**TICKET:** G5-1 Dialect JSON Schema
+**ATTIVITÀ:** Finalizzazione del dialect JSON Schema e miglioramento stub API
+
+**DETTAGLI:**
+Finalizzazione del JSON Schema dialect (`mif_jsonschema_dialect.json`) per soddisfare i requisiti del progetto e abilitare la validazione delle estensioni personalizzate in OpenAPI 3.1. Le attività principali includono:
+
+1. **Aggiornamento del dialect JSON Schema**:
+   * Impostato `$id` al percorso raw GitHub corretto: `https://raw.githubusercontent.com/SmokeJoy/agente-stampa-3d/main/mif_jsonschema_dialect.json`
+   * Modificato `x-risk` da enum a boolean come richiesto nei requisiti
+   * Aggiunto `x-internal` (boolean) per marcare endpoint/operazioni ad uso interno
+   * Impostato `unevaluatedProperties: false` per bloccare proprietà non previste
+   * Aggiunta sezione `meta.vocabulary` per definire formalmente le keyword custom
+   * Aggiornato il pattern di validazione per `operationId` (camelCase)
+
+2. **Miglioramento descrizioni OpenAPI**:
+   * Aggiornati summary e description per `/searchJobs` con dettagli sui marketplace supportati
+   * Aggiornati summary e description per `/addToCalendar` con informazioni sull'OAuth e gli scopes 
+   * Migliorate le descrizioni per renderle più GPT-friendly
+
+3. **Integrazione CI**:
+   * Aggiunto comando per eseguire `pytest -q tests/spec/test_schema_dialect.py` nel workflow CI
+
+4. **Documentazione**:
+   * Creato decision record in `docs/decisions/dialect_json_schema_decisions.md` che spiega le scelte delle keyword custom, la strategia per proprietà non riconosciute, e l'impatto previsto
+
+**FILE MODIFICATI:**
+* `mif_jsonschema_dialect.json` - Finalizzato il dialect secondo requisiti
+* `openapi_3_1_demo.json` - Migliorate le descrizioni degli endpoint
+* `.github/workflows/ci.yml` - Aggiunto step per test del dialect
+* `docs/decisions/dialect_json_schema_decisions.md` - Creato nuovo file di decisione
+
+**STATO FINALE:**
+* Il dialect JSON Schema è ora completo e conforme ai requisiti
+* Il file di decision record documenta le scelte fatte e il loro impatto
+* La pipeline CI è stata aggiornata per includere i test del dialect
+
+**PROSSIMI PASSI:**
+* Aprire issue G5-2 per la validazione del dialect in CI
+* Aprire issue G5-3 per la documentazione HTML con Redocly
+
+---

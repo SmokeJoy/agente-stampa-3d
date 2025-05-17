@@ -46,6 +46,8 @@ jobs:
             pre-commit run --all-files --show-diff-on-failure
             echo "Running tests with Pytest and generating coverage reports..."
             pytest -v --cov=agente_stampa_3d --cov-report=xml --cov-report=html tests/
+            echo "Running dialect schema validation test..."
+            pytest -q tests/spec/test_schema_dialect.py
             echo "Checking Spectral linting on OpenAPI schema..."
             spectral lint openapi_3_1_demo.json > spectral_results.log
             echo "Building package..."

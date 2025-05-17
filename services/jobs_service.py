@@ -7,8 +7,8 @@ permettendo di filtrare in base a parole chiave, posizione, budget e tag.  # noq
 from typing import List, Optional
 from uuid import UUID
 
-from pydantic.main import BaseModel
 from pydantic.fields import Field
+from pydantic.main import BaseModel
 
 
 class Job(BaseModel):
@@ -99,7 +99,9 @@ async def search_jobs(
         filtered_jobs = [job for job in filtered_jobs if job.budget >= min_budget]
 
     if max_budget is not None:
-        filtered_jobs = [job for job in filtered_jobs if job.budget <= max_budget]  # noqa: E501
+        filtered_jobs = [
+            job for job in filtered_jobs if job.budget <= max_budget
+        ]  # noqa: E501
 
     if tags:
         filtered_jobs = [

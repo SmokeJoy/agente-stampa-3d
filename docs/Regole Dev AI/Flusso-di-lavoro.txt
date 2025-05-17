@@ -1,0 +1,40 @@
+### 🚨 **FLUSSO DI LAVORO OBBLIGATORIO – AGENTE STAMPA 3D DEV AI** 🚨
+*(Come definito precedentemente, ma con enfasi sul ruolo del Teach Lead come punto di ricezione ordini e validazione finale)*
+
+📦 **INIZIO CICLO DI LAVORO**
+    │
+    ▼
+📩 **1. Ricezione Ordine di Lavoro dal Teach Lead **
+    │   (Deve essere associato a una Roadmap Ufficiale in `docs/roadmap/`)
+    │   (Se Roadmap mancante, vedi Articolo 8.3: richiedi Roadmap prima di procedere)
+    ▼
+📁 **2. Controllo Preliminare e Immersione Documentale da Fuoriclasse:**
+    │   → **Lettura obbligatoria e analisi critica** dei documenti rilevanti per il task in `E:\AGENTE-STAMPA-3D\docs\`, guidato dall'`indice_navigazione_docs.md`.
+    │     *Focus specifico su: Roadmap, Logbook precedenti, Toolset, Regole Dev AI (incluso Articolo 12 sulla Modularità), Architettura Progetto.*
+    ▼
+📗 **3. Conferma Interna di Piena Comprensione Documentale.**
+    ▼
+🔍 **4. Analisi Strategica del Task (Considerando la Modularità):**
+    │   → Definire *cosa* e *come*, in coerenza con: Architettura, Sicurezza, **Modularità (Articolo 12)**, Specifiche API.
+    ▼
+🧰 **5. Sviluppo / Refactoring del Codice con Maestria (e Modularità):**
+    │   → Implementare o modificare, **applicando attivamente il principio di granularità (Articolo 12)**. Fare riferimento costante alla documentazione.
+    │   → Rispettare type hinting, logging, commenti, sicurezza. Scrivere/aggiornare test (Articolo 5).
+    ▼
+🤔 **6. Gestione Dubbi Operativi con Protocollo (Articolo 4):**
+    │   → **PRIMO:** Rileggere tutta la documentazione.
+    │   → **SECONDO (SOLO SE NECESSARIO):** Sospendere, formulare domanda chiara, contattare il Teach Lead .
+    ▼
+📝 **7. Documentazione Post-Sviluppo Impeccabile (Articolo 11):**
+    │   → **Aggiornare immediatamente** `logbook_unificato_dev_ai.md`.
+    │   → **Aggiornare** `indice_navigazione_docs.md` se necessario.
+    │   → Aggiornare documentazione specifica di moduli, schemi, toolset.
+    │   → Aggiornare stato task sulla Roadmap.
+    ▼
+✅ **8. Esecuzione e Validazione Test Rigorosa.**
+    ▼
+📨 **9. Report Formale di Completamento Task al Teach Lead :**
+    │   → Inviare report con: task ID, descrizione lavoro (evidenziando l'approccio modulare se rilevante), link file, conferma test OK, riferimenti documentazione.
+    │   → Attendere mia validazione e/o nuovo ordine di lavoro.
+    ▼
+🔁 **10. Ritorno a Fase 1 (Pronto per Nuove Sfide d'Eccellenza).**

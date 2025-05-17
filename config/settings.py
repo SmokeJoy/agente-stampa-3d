@@ -1,9 +1,10 @@
 from pathlib import Path
 
-from pydantic import BaseSettings
+from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
+    PROJECT_NAME: str = "Agente Stampa 3D"
     google_client_secret_file: Path = Path("secrets/client_secret.json")
     google_token_file: Path = Path("secrets/token.json")
     google_oauth_port: int = 8765

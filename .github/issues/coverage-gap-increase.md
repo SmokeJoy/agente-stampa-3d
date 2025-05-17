@@ -44,5 +44,3 @@ Incrementare la copertura dei test dal corrente 81% all'85% entro la fine del mi
 
 - [PR #feature-ci-integration](https://github.com/organizzazione/agente-stampa-3D/pull/feature-ci-integration)
 - Task G6-INIT del logbook unificato
-
-

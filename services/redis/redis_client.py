@@ -3,119 +3,113 @@
 This module provides a simple Redis client wrapper with connection management
 and common Redis operations used across the application.
 """
-import os
-from typing import Any, Optional, Union
+
+from typing import Optional, Union
 
 import redis
-from redis import Redis
 
 
 class RedisClient:
-    """Redis client wrapper with connection management and common operations."""
+    """Redis client wrapper."""
 
-    def __init__(
-        self,
-        host: str = os.environ.get("REDIS_HOST", "localhost"),
-        port: int = int(os.environ.get("REDIS_PORT", 6379)),
-        db: int = int(os.environ.get("REDIS_DB", 0)),
-        password: Optional[str] = os.environ.get("REDIS_PASSWORD"),
-        ssl: bool = os.environ.get("REDIS_SSL", "false").lower() == "true",
-    ):
-        """Initialize Redis client with connection parameters.
+    def __init__(self, host="localhost", port=6379, db=0, decode_responses=True):
+        """Initialize the Redis client.
 
         Args:
-            host: Redis server hostname
-            port: Redis server port
-            db: Redis database number
-            password: Optional Redis password
-            ssl: Whether to use SSL for connection
+            host: Redis host
+            port: Redis port
+            db: Redis database
+            decode_responses: Whether to decode responses
         """
-        self.connection_params = {
-            "host": host,
-            "port": port,
-            "db": db,
-            "decode_responses": True,  # Always decode to str
-        }
-        
-        if password:
-            self.connection_params["password"] = password
-        
-        if ssl:
-            self.connection_params["ssl"] = True
-            self.connection_params["ssl_cert_reqs"] = None
-        
-        self._client: Optional[Redis] = None
+        self._client = None
+        self._host = host
+        self._port = port
+        self._db = db
+        self._decode_responses = decode_responses
 
     @property
-    def client(self) -> Redis:
-        """Get Redis client instance, creating it if needed.
-        
+    def client(self) -> redis.Redis:
+        """Get the Redis client, initializing it if necessary.
+
         Returns:
-            Redis: Configured Redis client
+            redis.Redis: Redis client
         """
         if self._client is None:
-            self._client = redis.Redis(**self.connection_params)
+            self._client = redis.Redis(
+                host=self._host,
+                port=self._port,
+                db=self._db,
+                decode_responses=self._decode_responses,
+            )
         return self._client
 
     def incr(self, key: str, amount: int = 1) -> int:
-        """Increment a key by the given amount.
-        
+        """Increment a key's value.
+
         Args:
-            key: The key to increment
-            amount: The amount to increment by
-            
+            key: Key to increment
+            amount: Amount to increment by
+
         Returns:
-            int: The new value
+            int: New value
         """
         return self.client.incr(key, amount)
 
     def expire(self, key: str, seconds: int) -> bool:
-        """Set an expiration time on a key.
-        
+        """Set key expiration.
+
         Args:
-            key: The key to expire
-            seconds: The expiration time in seconds
-            
+            key: Key to set expiration for
+            seconds: Expiration time in seconds
+
         Returns:
-            bool: True if successful, False otherwise
+            bool: Whether expiration was set
         """
-        return bool(self.client.expire(key, seconds))
+        return self.client.expire(key, seconds)
 
     def ttl(self, key: str) -> int:
-        """Get the TTL of a key.
-        
+        """Get key time-to-live.
+
         Args:
-            key: The key to check
-            
+            key: Key to get TTL for
+
         Returns:
-            int: TTL in seconds, -1 if no expiry, -2 if key doesn't exist
+            int: TTL in seconds
         """
         return self.client.ttl(key)
 
+    def exists(self, key: str) -> bool:
+        """Check if key exists.
+
+        Args:
+            key: Key to check
+
+        Returns:
+            bool: Whether key exists
+        """
+        return bool(self.client.exists(key))
+
     def get(self, key: str) -> Optional[str]:
         """Get a string value from Redis.
-        
+
         Args:
             key: The key to get
-            
+
         Returns:
             str: The value or None if not found
         """
         return self.client.get(key)
 
     def set(
-        self, 
-        key: str, 
-        value: Union[str, bytes, int, float], 
-        ex: Optional[int] = None
+        self, key: str, value: Union[str, bytes, int, float], ex: Optional[int] = None
     ) -> bool:
         """Set a string value in Redis with optional expiration.
-        
+
         Args:
             key: The key to set
             value: The value to set
             ex: Optional expiration time in seconds
-            
+
         Returns:
             bool: True if successful, False otherwise
         """
@@ -123,15 +117,15 @@ class RedisClient:
 
     def delete(self, key: str) -> bool:
         """Delete a key from Redis.
-        
+
         Args:
             key: The key to delete
-            
+
         Returns:
             bool: True if key was deleted, False otherwise
         """
         return bool(self.client.delete(key))
 
 
-# Default client instance
+# Default Redis client instance
 default_redis_client = RedisClient()

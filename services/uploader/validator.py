@@ -3,12 +3,21 @@
 import inspect
 import re
 from pathlib import Path
+from typing import NamedTuple
 
-from fastapi import UploadFile
+from fastapi import HTTPException, UploadFile, status
 
 from config import upload_settings
 
 _INVALID_CHARS = re.compile(r"[^A-Za-z0-9_.\-]")
+
+
+class ValidatedFile(NamedTuple):
+    """Risultato della validazione di un file."""
+
+    sanitized_filename: str
+    size: int
+    mime_type: str
 
 
 def validate_mime(file_mime: str | None, allowed_mimes: list[str]) -> bool:
@@ -49,10 +58,21 @@ async def validate_upload_file(
     file: UploadFile,
     allowed_mimes: list[str] = upload_settings.ALLOWED_MIME_TYPES,
     max_size_bytes: int = upload_settings.MAX_UPLOAD_SIZE_BYTES,
-) -> tuple[bool, str, str | None, int | None, str]:
+) -> ValidatedFile:
     """
     Validates an UploadFile instance against MIME type and size.
-    Returns a tuple: (is_valid, message, sanitized_filename, file_size, file_mime)
+    Raises HTTPException if the file is invalid.
+
+    Args:
+        file: The uploaded file
+        allowed_mimes: List of allowed MIME types
+        max_size_bytes: Maximum allowed file size in bytes
+
+    Returns:
+        ValidatedFile: Oggetto contenente i dati del file validato
+
+    Raises:
+        HTTPException: If file size exceeds the limit or MIME type is not allowed
     """
     file_size = getattr(file, "size", None)
     if file_size is None:
@@ -71,12 +91,8 @@ async def validate_upload_file(
             f"File size {file_size / (1024*1024):.2f} MB exceeds maximum of "
             f"{max_size_bytes / (1024*1024):.2f} MB."
         )
-        return (
-            False,
-            error_msg,
-            None,
-            file_size,
-            file.content_type,
+        raise HTTPException(
+            status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE, detail=error_msg
         )
 
     if not validate_mime(file.content_type, allowed_mimes):
@@ -85,14 +101,10 @@ async def validate_upload_file(
             f"File MIME type '{file.content_type}' is not allowed. "
             f"Allowed types: {allowed_types_str}."
         )
-        return (
-            False,
-            error_msg,
-            None,
-            file_size,
-            file.content_type,
+        raise HTTPException(
+            status_code=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE, detail=error_msg
         )
 
     sanitized = sanitize_filename(file.filename or "default_upload")
 
-    return True, "File is valid.", sanitized, file_size, file.content_type
+    return ValidatedFile(sanitized, file_size, file.content_type)

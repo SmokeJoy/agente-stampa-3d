@@ -1,6 +1,7 @@
 """Main entry point for FastAPI application."""
 
 import os
+from contextlib import asynccontextmanager
 from pathlib import Path
 
 from fastapi import FastAPI
@@ -35,6 +36,32 @@ app.add_middleware(
 app.include_router(uploader_router, prefix=API_PREFIX)
 
 
+# Lifespan context manager
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Manage startup and shutdown events."""
+    # Startup logic
+    print("Application startup...")
+    from config.upload_settings import UPLOAD_ROOT
+
+    if not os.path.exists(UPLOAD_ROOT):
+        Path(UPLOAD_ROOT).mkdir(parents=True, exist_ok=True)
+        print(f"Created upload directory: {UPLOAD_ROOT}")
+    else:
+        print(f"Upload directory already exists: {UPLOAD_ROOT}")
+
+    yield
+
+    # Shutdown logic
+    print("Application shutdown...")
+    # Qui eventuali operazioni di cleanup, es. chiusura connessioni Redis
+    pass
+
+
+# Aggiorna l'app con il lifespan manager
+app.router.lifespan_context = lifespan
+
+
 @app.get("/")
 async def root():
     """Root endpoint that returns information about the API."""
@@ -50,20 +77,3 @@ async def root():
             },
         ],
     }
-
-
-@app.on_event("startup")
-async def startup_event():
-    """Initialize resources when the application starts."""
-    # Create upload directory if it doesn't exist
-    from config.upload_settings import UPLOAD_ROOT
-
-    if not os.path.exists(UPLOAD_ROOT):
-        Path(UPLOAD_ROOT).mkdir(parents=True, exist_ok=True)
-
-
-@app.on_event("shutdown")
-async def shutdown_event():
-    """Clean up resources when the application shuts down."""
-    # Close Redis connections, etc.
-    pass

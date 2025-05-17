@@ -167,8 +167,8 @@
     },
     "/searchJobs": {
       "get": {
-        "summary": "Search for 3D printing jobs.",
-        "description": "Searches for available 3D printing jobs based on keywords, location, budget, and tags. Returns a list of matching jobs.",
+        "summary": "Ricerca lavori di stampa 3D disponibili su marketplace online",
+        "description": "Trova opportunità di lavoro di stampa 3D su piattaforme come Upwork, Freelancer e Indeed. Supporta filtri per parole chiave, località, budget minimo e tag. Restituisce un elenco dettagliato di lavori con titolo, descrizione, budget e dettagli del committente. Utile per chi cerca progetti di stampa 3D freelance o opportunità di collaborazione.",
         "operationId": "searchJobs",
         "tags": ["Jobs"],
         "parameters": [
@@ -251,8 +251,8 @@
     },
     "/addToCalendar": {
       "post": {
-        "summary": "Add an event to the Google Calendar.",
-        "description": "Adds a new event to the user's Google Calendar. Requires event details such as summary, start and end times. This action is typically authenticated via OAuth 2.0 to access the user's calendar.",
+        "summary": "Aggiungi un evento di stampa 3D al calendario Google",
+        "description": "Crea un nuovo evento nel calendario Google dell'utente per tracciare scadenze, appuntamenti con clienti o sessioni di stampa. Supporta titolo, descrizione, orari di inizio/fine e lista partecipanti. L'operazione richiede autenticazione OAuth2 con Google Calendar API, con scopes 'calendar.events' e 'calendar.readonly'. L'evento creato viene automaticamente sincronizzato su tutti i dispositivi dell'utente collegati al suo account Google.",
         "operationId": "addToCalendar",
         "tags": ["Calendar"],
         "requestBody": {
