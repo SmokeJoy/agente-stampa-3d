@@ -494,3 +494,26 @@ La milestone G4 è ora considerata completata, con tutti i requisiti soddisfatti
 La milestone G5 potrà iniziare dopo la validazione da parte del Teach Lead.
 
 **COMMIT:** Feature/ci-integration (SHA: 92fa41da46e21ea43dec8120144de198bcbefc92)
+
+---
+
+**DATA:** 2025-05-17T14:30:00Z  
+**TICKET:** G4-CLOSURE  
+**ATTIVITÀ:** Correzione firma GPG e chiusura milestone G4
+
+**DETTAGLI:**  
+Corretto l'ultimo commit della milestone G4 per garantire la corretta firma GPG, come richiesto dall'Art. 5.2 delle linee guida del progetto:
+
+1. **Firma GPG riattivata:**
+   - Configurato nuovamente `git config --local commit.gpgsign true`
+   - Rifirmato il commit con `git commit --amend --no-edit -S`
+   - Verificato con successo tramite `git log --show-signature -1`
+
+2. **Aggiornamento PR:**
+   - Repository aggiornato con `git push --force-with-lease`
+   - Pipeline CI riavviata con il commit correttamente firmato
+
+**STATO MILESTONE:**  
+La milestone G4 è ora completamente chiusa con tutti i requisiti soddisfatti, inclusa la firma GPG su tutti i commit.
+
+**COMMIT:** Feature/ci-integration (SHA: 66ca2602e11ba6df01e0a48ebbce5976e80ae3db)
