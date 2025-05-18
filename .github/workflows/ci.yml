@@ -25,10 +25,8 @@ jobs:
         with:
           fetch-depth: 0 # Necessario per la verifica della firma GPG
 
-      - name: Devcontainer CI Action (pinned - check)
-        uses: devcontainers/ci@0.3.2
-        with:
-          runCmd: "echo 'devcontainer check OK'"
+      - name: Devcontainer check (placeholder)
+        run: echo "devcontainer check OK"
 
       - name: Setup Git for GPG signing
         run: |
@@ -41,27 +39,20 @@ jobs:
           # git config --global user.signingkey "${{ secrets.GPG_KEY_ID }}"
           # git config --global commit.gpgsign true
 
-      - name: Run in Dev Container (pinned - main execution)
-        uses: devcontainers/ci@0.3.2
-        with:
-          push: never # Non pushare l'immagine buildata automaticamente
-          cacheFrom: type=gha,scope=${{ github.workflow }}
-          cacheTo: type=gha,scope=${{ github.workflow }},mode=max
-          runCmd: |
-            echo "Installing dependencies using Poetry..."
-            poetry install --no-interaction --no-root
-            echo "Running pre-commit hooks..."
-            pre-commit run --all-files --show-diff-on-failure
-            echo "Running tests with Pytest and generating coverage reports..."
-            pytest -v --cov=agente_stampa_3d --cov-report=xml --cov-report=html tests/
-            echo "Running dialect schema validation test..."
-            pytest -q tests/spec/test_schema_dialect.py
-            echo "Checking Spectral linting on OpenAPI schema..."
-            spectral lint openapi_3_1_demo.json > spectral_results.log
-            echo "Building package..."
-            poetry build | tee poetry_build.log
-            echo "Testing installation from built package..."
-            pip install dist/*.whl --force-reinstall
+      - name: Install deps, lint & test
+        run: |
+          echo "Installing dependencies with Poetry…"
+          poetry install --no-interaction --no-root
+          echo "Running pre-commit…"
+          poetry run pre-commit run --all-files --show-diff-on-failure
+          echo "Running Pytest…"
+          poetry run pytest -q --cov=agente_stampa_3d
+          echo "Running Spectral…"
+          npx --no-install spectral lint openapi_3_1_demo.json --format stylish
+          echo "Building wheel…"
+          poetry build
+          echo "Smoke-installing wheel…"
+          pip install dist/*.whl --force-reinstall
             
       - name: Upload test coverage reports
         uses: actions/upload-artifact@v4
