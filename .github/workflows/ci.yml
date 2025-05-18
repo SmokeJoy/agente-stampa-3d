@@ -1,108 +1,68 @@
-name: CI Pipeline
+name: Lint, test e build
 
 on:
   push:
-    branches:
-      - main
-      - develop
-      - 'feature/*'
+    branches: [ "**" ]
   pull_request:
-    branches:
-      - main
-      - develop
+    branches: [ "**" ]
 
 jobs:
-  lint-and-test:
-    name: Lint, Test & Build
+  lint-test:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+
     steps:
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-
-      - name: Check out code
+      # ---------------- CHECKOUT ​----------------
+      - name: Checkout code
         uses: actions/checkout@v4
+
+      # ---------------- PYTHON ENV --------------
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
-          fetch-depth: 0 # Necessario per la verifica della firma GPG
+          python-version: "3.12"
+          cache: "poetry"
 
-      - name: Devcontainer check (placeholder)
-        run: echo "devcontainer check OK"
+      # ------- INSTALL POETRY (dev-tools) -------
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+          installer-parallel: true
 
-      - name: Setup Git for GPG signing
-        run: |
-          git config --global user.name "Dev AI"
-          git config --global user.email "dev.ai@example.com"
-          # In un ambiente reale, qui verrebbero configurate le chiavi GPG importandole da secrets
-          # Esempio:
-          # echo "${{ secrets.GPG_PRIVATE_KEY }}" > private.key
-          # gpg --import private.key
-          # git config --global user.signingkey "${{ secrets.GPG_KEY_ID }}"
-          # git config --global commit.gpgsign true
+      # ---------------- NODE ENV ----------------
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "npm"
 
+      - name: Install JS dev-dependencies (Spectral)
+        run: npm ci
+
+      # -------- LINT, TEST, BUILD, SPECTRAL -----
       - name: Install deps, lint & test
+        env:
+          POETRY_VIRTUALENVS_IN_PROJECT: "true"
         run: |
           echo "Installing dependencies with Poetry…"
           poetry install --no-interaction --no-root
+
           echo "Running pre-commit…"
           poetry run pre-commit run --all-files --show-diff-on-failure
+
           echo "Running Pytest…"
           poetry run pytest -q --cov=agente_stampa_3d
+
           echo "Running Spectral…"
           npx --no-install spectral lint openapi_3_1_demo.json --format stylish
+
           echo "Building wheel…"
           poetry build
+
           echo "Smoke-installing wheel…"
           pip install dist/*.whl --force-reinstall
-            
-      - name: Upload test coverage reports
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-coverage-reports
-          path: |
-            coverage.xml
-            htmlcov/
-            
-      - name: Upload quality reports
-        uses: actions/upload-artifact@v4
-        with:
-          name: quality-reports
-          path: |
-            spectral_results.log
-            poetry_build.log
-            
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: build-artifacts
-          path: |
-            dist/*.whl
-            dist/*.tar.gz
 
-  gpg-verification:
-    name: GPG Verification
-    runs-on: ubuntu-latest
-    needs: lint-and-test
-    if: github.event_name == 'pull_request'
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0 # Necessario per recuperare la history dei commit
-
-      - name: Set up GPG suite
-        uses: crazy-max/ghaction-import-gpg@v6
-        with:
-          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY || '' }}
-          passphrase: ${{ secrets.GPG_PASSPHRASE || '' }}
-          git_user_signingkey: true
-          git_commit_gpgsign: true
-          
-      - name: Check commit signatures
-        run: |
-          echo "Checking commits for GPG signatures..."
-          if [ "${{ secrets.GPG_PRIVATE_KEY }}" != "" ]; then
-            # Verifica ogni commit nel PR
-            git log --format="%H %GS" origin/${{ github.base_ref }}..HEAD | grep "UNKNOWN\|BAD" && exit 1 || echo "All commits are signed"
-          else
-            echo "GPG verification skipped - No GPG key configured in secrets"
-          fi
+      # --------- DIALÉCT TEST DEDICATO ----------
+      - name: Dialect validation
+        run: poetry run pytest -q tests/spec/test_schema_dialect.py
