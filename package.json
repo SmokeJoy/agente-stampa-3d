@@ -1,0 +1,10 @@
+{
+  "name": "agente-stampa-3d-devtools",
+  "private": true,
+  "devDependencies": {
+    "@stoplight/spectral-cli": "^6.11.0"
+  },
+  "scripts": {
+    "spectral:lint": "spectral lint openapi_3_1_demo.json --format stylish"
+  }
+} 
