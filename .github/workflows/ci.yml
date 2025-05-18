@@ -25,10 +25,10 @@ jobs:
         with:
           fetch-depth: 0 # Necessario per la verifica della firma GPG
 
-      - name: Devcontainer CI Action (pinned)
-        uses: devcontainers/ci@v0.3
+      - name: Devcontainer CI Action (pinned - check)
+        uses: devcontainers/ci@0.3.2
         with:
-          runCmd: "echo 'devcontainer OK'"
+          runCmd: "echo 'devcontainer check OK'"
 
       - name: Setup Git for GPG signing
         run: |
@@ -41,8 +41,8 @@ jobs:
           # git config --global user.signingkey "${{ secrets.GPG_KEY_ID }}"
           # git config --global commit.gpgsign true
 
-      - name: Run in Dev Container
-        uses: devcontainers/ci@v0
+      - name: Run in Dev Container (pinned - main execution)
+        uses: devcontainers/ci@0.3.2
         with:
           push: never # Non pushare l'immagine buildata automaticamente
           cacheFrom: type=gha,scope=${{ github.workflow }}
