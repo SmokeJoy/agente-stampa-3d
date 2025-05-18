@@ -17,11 +17,19 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - name: Checkout code
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Check out code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # Necessario per pre-commit e GPG check
-          
+          fetch-depth: 0 # Necessario per la verifica della firma GPG
+
+      - name: Devcontainer CI Action (pinned)
+        uses: devcontainers/ci@v0.3
+        with:
+          runCmd: "echo 'devcontainer OK'"
+
       - name: Setup Git for GPG signing
         run: |
           git config --global user.name "Dev AI"
