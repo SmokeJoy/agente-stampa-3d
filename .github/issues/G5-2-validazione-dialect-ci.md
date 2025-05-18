@@ -2,7 +2,7 @@
 
 ## Scope
 
-Integrare la validazione del dialect JSON Schema nel workflow CI per garantire che lo schema OpenAPI 3.1 
+Integrare la validazione del dialect JSON Schema nel workflow CI per garantire che lo schema OpenAPI 3.1
 sia sempre conforme al dialect definito in `mif_jsonschema_dialect.json`.
 
 ## Obiettivi

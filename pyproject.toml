@@ -43,6 +43,7 @@ httplib2 = "^0.22.0"
 redis = "^5.0.4"
 pydantic-settings = "^2.0.0"
 jsonschema = ">=4.22,<5"
+python-multipart = "^0.0.20"
 
 [tool.poetry.group.dev.dependencies]
 black = "^25.1.0"

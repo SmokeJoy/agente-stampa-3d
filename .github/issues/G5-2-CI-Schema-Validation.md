@@ -2,7 +2,7 @@
 
 ## Scope
 
-Integrare la validazione del dialect JSON Schema nel workflow CI per garantire che lo schema OpenAPI 3.1 
+Integrare la validazione del dialect JSON Schema nel workflow CI per garantire che lo schema OpenAPI 3.1
 sia sempre conforme al dialect definito in `mif_jsonschema_dialect.json`.
 
 ## Obiettivi
@@ -19,12 +19,12 @@ sia sempre conforme al dialect definito in `mif_jsonschema_dialect.json`.
    - [ ] Confermare che `test_dialect_schema_is_valid` verifica la struttura del dialect
    - [ ] Confermare che `test_openapi_schema_validates_against_dialect` valida lo schema OpenAPI
    - [ ] Aggiungere assertion più specifiche per verificare campi critici
-   
+
 2. Aggiornamento workflow CI:
    - [ ] Aggiungere step dedicated nel file `.github/workflows/ci.yml`
    - [ ] Installare dipendenze necessarie (jsonschema)
    - [ ] Configurare output di test per diagnostica
-   
+
 3. Artefatti CI:
    - [ ] Generare report di validazione leggibili
    - [ ] Salvare report come artefatto della pipeline

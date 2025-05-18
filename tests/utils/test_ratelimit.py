@@ -1,17 +1,17 @@
 """Test per la funzionalità di rate limiting."""
 
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
 import pytest
 from fastapi import FastAPI, Request, Response
 from fastapi.testclient import TestClient
 
 from utils.ratelimit import (
+    create_key_func,
     disable_rate_limiting,
     enable_rate_limiting,
-    rate_limit,
     get_default_key,
-    create_key_func,
+    rate_limit,
 )
 
 
@@ -69,9 +69,7 @@ def test_rate_limit_headers_presence():
     assert "X-RateLimit-Limit" in response.headers
     assert "X-RateLimit-Remaining" in response.headers
     assert "X-RateLimit-Reset" in response.headers
-    assert (
-        response.headers["X-RateLimit-Limit"] == "2"
-    )  # Il limite è sempre 2 per questo endpoint
+    assert response.headers["X-RateLimit-Limit"] == "2"  # Il limite è sempre 2 per questo endpoint
 
 
 def test_rate_limit_disabled():
@@ -89,9 +87,7 @@ def test_rate_limit_disabled():
 
     # Seconda richiesta (dovrebbe passare anche se il limite è stato superato)
     response = client.get("/disabled")
-    assert (
-        response.status_code == 200
-    )  # Non 429, perché il rate limiting è disabilitato
+    assert response.status_code == 200  # Non 429, perché il rate limiting è disabilitato
 
     # Riabilita il rate limiting per i test successivi
     enable_rate_limiting()
@@ -153,12 +149,8 @@ def test_burst_rate_limit_with_errors():
         # Testiamo che anche con errori Redis, l'API rimane utilizzabile
         for i in range(3):  # Facciamo 3 richieste (oltre il limite di 2)
             response = client.get("/test")
-            assert (
-                response.status_code == 200
-            )  # Tutte le richieste dovrebbero passare (fallback sicuro)
-            assert (
-                "X-RateLimit-Limit" in response.headers
-            )  # Headers dovrebbero essere comunque impostati
+            assert response.status_code == 200  # Tutte le richieste dovrebbero passare (fallback sicuro)
+            assert "X-RateLimit-Limit" in response.headers  # Headers dovrebbero essere comunque impostati
 
 
 @pytest.mark.parametrize(
@@ -214,29 +206,29 @@ def test_window_expiry_simulation():
     # senza fare affidamento sul comportamento effettivo di Redis
     app = create_test_app()
     client = TestClient(app)
-    
+
     # Configuriamo un endpoint per questo test specifico
     @app.get("/window-test")
     @rate_limit(key_prefix="window", max_calls=1, window_seconds=1)
     async def window_test_endpoint(request: Request, response: Response):
         return {"success": True}
-    
+
     # Disabilita il rate limiting per verificare solo la presenza degli header
     disable_rate_limiting()
-    
+
     # Prima richiesta
     response = client.get("/window-test")
     assert response.status_code == 200
     assert "X-RateLimit-Reset" in response.headers
     # Verifico solo la presenza dell'header
-    
+
     # Simula richiesta dopo scadenza (senza effettivamente aspettare)
     # In un ambiente reale, la finestra scadrebbe dopo window_seconds
     response = client.get("/window-test")
     assert response.status_code == 200
-    
+
     # Verifica che il tempo di reset sia presente
     assert "X-RateLimit-Reset" in response.headers
-    
+
     # Riabilita il rate limiting per i test successivi
     enable_rate_limiting()

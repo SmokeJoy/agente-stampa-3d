@@ -9,11 +9,16 @@ from fastapi import HTTPException, status
 from fastapi.testclient import TestClient
 
 from config.upload_settings import ALLOWED_MIME_TYPES, MAX_UPLOAD_SIZE_BYTES
+
 # from main import API_PREFIX # Rimosso
 from services.uploader.uploader_service import UploadResult, upload_file
-from services.uploader.validator import (ValidatedFile, sanitize_filename,
-                                         validate_mime, validate_size,
-                                         validate_upload_file)
+from services.uploader.validator import (
+    ValidatedFile,
+    sanitize_filename,
+    validate_mime,
+    validate_size,
+    validate_upload_file,
+)
 from tests.conftest import redis_patch
 
 # # Mock Redis client # Rimosso
@@ -276,27 +281,19 @@ async def test_valid_stl_upload():
     # Set up mocks for the required components
     storage_mock = MagicMock()
     storage_mock.save = AsyncMock(return_value="test-file-id")
-    storage_mock.get_url = MagicMock(
-        return_value="https://storage.example.com/test-file-id"
-    )
+    storage_mock.get_url = MagicMock(return_value="https://storage.example.com/test-file-id")
 
     # Mock validate_upload_file to return a ValidatedFile
-    validated_file = ValidatedFile(
-        sanitized_filename="valid_model.stl", size=1024, mime_type="model/stl"
-    )
+    validated_file = ValidatedFile(sanitized_filename="valid_model.stl", size=1024, mime_type="model/stl")
 
     # Test that upload_file returns a valid UploadResult
-    with patch(
-        "services.uploader.validator.validate_upload_file", return_value=validated_file
-    ):
+    with patch("services.uploader.validator.validate_upload_file", return_value=validated_file):
         with patch("uuid.uuid4", return_value="test-uuid"):
             result = await upload_file(mock_file, storage_backend=storage_mock)
 
             # Verify the result
             assert isinstance(result, UploadResult)
-            assert (
-                result.file_id == "test-file-id"
-            )  # Should use the value returned by storage.save
+            assert result.file_id == "test-file-id"  # Should use the value returned by storage.save
             assert result.filename == "valid_model.stl"
             assert result.content_type == "model/stl"
             assert result.size == 1024
@@ -316,19 +313,13 @@ async def test_valid_obj_upload():
     # Set up mocks for the required components
     storage_mock = MagicMock()
     storage_mock.save = AsyncMock(return_value="test-file-id-obj")
-    storage_mock.get_url = MagicMock(
-        return_value="https://storage.example.com/test-file-id-obj"
-    )
+    storage_mock.get_url = MagicMock(return_value="https://storage.example.com/test-file-id-obj")
 
     # Mock validate_upload_file to return a ValidatedFile
-    validated_file = ValidatedFile(
-        sanitized_filename="valid_model.obj", size=2048, mime_type="model/obj"
-    )
+    validated_file = ValidatedFile(sanitized_filename="valid_model.obj", size=2048, mime_type="model/obj")
 
     # Test that upload_file returns a valid UploadResult
-    with patch(
-        "services.uploader.validator.validate_upload_file", return_value=validated_file
-    ):
+    with patch("services.uploader.validator.validate_upload_file", return_value=validated_file):
         with patch("uuid.uuid4", return_value="test-uuid-obj"):
             result = await upload_file(mock_file, storage_backend=storage_mock)
 
@@ -374,19 +365,13 @@ async def test_upload_storage_called():
     # Create a mock storage backend
     storage_mock = MagicMock()
     storage_mock.save = AsyncMock(return_value="saved-file-id")
-    storage_mock.get_url = MagicMock(
-        return_value="https://storage.example.com/saved-file-id"
-    )
+    storage_mock.get_url = MagicMock(return_value="https://storage.example.com/saved-file-id")
 
     # Mock validate_upload_file to return a ValidatedFile
-    validated_file = ValidatedFile(
-        sanitized_filename="test.stl", size=1024, mime_type="model/stl"
-    )
+    validated_file = ValidatedFile(sanitized_filename="test.stl", size=1024, mime_type="model/stl")
 
     # Test that storage.save is called with the correct parameters
-    with patch(
-        "services.uploader.validator.validate_upload_file", return_value=validated_file
-    ):
+    with patch("services.uploader.validator.validate_upload_file", return_value=validated_file):
         with patch("uuid.uuid4", return_value="test-uuid"):
             await upload_file(mock_file, storage_backend=storage_mock)
 
@@ -407,19 +392,13 @@ async def test_file_id_returned_on_success():
     # Set up mocks for the required components
     storage_mock = MagicMock()
     storage_mock.save = AsyncMock(return_value="custom-file-id")
-    storage_mock.get_url = MagicMock(
-        return_value="https://storage.example.com/custom-file-id"
-    )
+    storage_mock.get_url = MagicMock(return_value="https://storage.example.com/custom-file-id")
 
     # Mock validate_upload_file to return a ValidatedFile
-    validated_file = ValidatedFile(
-        sanitized_filename="test.stl", size=1024, mime_type="model/stl"
-    )
+    validated_file = ValidatedFile(sanitized_filename="test.stl", size=1024, mime_type="model/stl")
 
     # Test that upload_file returns a valid UploadResult with the correct file_id and status
-    with patch(
-        "services.uploader.validator.validate_upload_file", return_value=validated_file
-    ):
+    with patch("services.uploader.validator.validate_upload_file", return_value=validated_file):
         with patch("uuid.uuid4", return_value="test-uuid"):
             result = await upload_file(mock_file, storage_backend=storage_mock)
 

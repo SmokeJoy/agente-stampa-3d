@@ -13,8 +13,7 @@ from pytest_mock import MockerFixture
 
 from config import upload_settings
 from services.uploader.storage import InMemoryStorage, StorageBackend
-from services.uploader.uploader_service import (UploadResult, notify_webhook,
-                                                upload_file)
+from services.uploader.uploader_service import UploadResult, notify_webhook, upload_file
 
 
 class MockResponse:
@@ -79,20 +78,14 @@ async def test_upload_file_happy_path(mock_file: UploadFile, storage: InMemorySt
 
 
 @pytest.mark.asyncio
-async def test_upload_file_with_webhook(
-    mock_file: UploadFile, storage: InMemoryStorage, mocker: MockerFixture
-):
+async def test_upload_file_with_webhook(mock_file: UploadFile, storage: InMemoryStorage, mocker: MockerFixture):
     """Test file upload with webhook notification."""
     # Arrange
     webhook_url = "https://webhook.example.com/endpoint"
-    mock_notify = mocker.patch(
-        "services.uploader.uploader_service.notify_webhook", return_value=True
-    )
+    mock_notify = mocker.patch("services.uploader.uploader_service.notify_webhook", return_value=True)
 
     # Act
-    result = await upload_file(
-        mock_file, storage_backend=storage, webhook_url=webhook_url
-    )
+    result = await upload_file(mock_file, storage_backend=storage, webhook_url=webhook_url)
 
     # Assert
     assert result.status == "stored"

@@ -3,8 +3,16 @@
 import os
 from typing import Optional
 
-from fastapi import (APIRouter, File, Form, HTTPException, Request, Response,
-                     UploadFile, status)
+from fastapi import (
+    APIRouter,
+    File,
+    Form,
+    HTTPException,
+    Request,
+    Response,
+    UploadFile,
+    status,
+)
 
 from config import upload_settings
 from services.uploader.uploader_service import upload_file
@@ -32,16 +40,11 @@ SIZE_DESC = "Optional override for maximum upload size in bytes"
 @router.post(
     "/upload",
     summary="Upload a 3D model file",
-    description=(
-        "Upload an STL or OBJ file for 3D printing. "
-        "Files are validated for type and size."
-    ),
+    description=("Upload an STL or OBJ file for 3D printing. " "Files are validated for type and size."),
     response_description="File upload result with metadata and storage information",  # noqa: E501
     status_code=status.HTTP_201_CREATED,
 )
-@rate_limit(
-    key_prefix="upload", max_calls=10, window_seconds=60
-)  # 10 uploads per minute per IP/API key
+@rate_limit(key_prefix="upload", max_calls=10, window_seconds=60)  # 10 uploads per minute per IP/API key
 async def upload_model(
     request: Request,
     response: Response,
@@ -73,9 +76,7 @@ async def upload_model(
     # Check if filename exists - questa validazione deve avvenire PRIMA delle validazioni
     # automatiche di FastAPI, altrimenti sarà FastAPI a gestire questo caso con 422  # noqa: E501
     if not file or not file.filename:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="File has no name"
-        )
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="File has no name")
 
     # Use environment variable override if provided, otherwise use config or passed value
     effective_max_size = (

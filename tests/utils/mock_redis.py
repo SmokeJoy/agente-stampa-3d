@@ -1,6 +1,5 @@
 """Redis mock per i test."""
 
-import time
 from typing import Dict, Optional, Set, Tuple, Union
 
 from services.redis.redis_client import RedisClient
@@ -184,9 +183,7 @@ class MockRedisClient(RedisClient):
             return None
         return str(self._data[key])
 
-    def set(
-        self, key: str, value: Union[str, bytes, int, float], ex: Optional[int] = None
-    ) -> bool:
+    def set(self, key: str, value: Union[str, bytes, int, float], ex: Optional[int] = None) -> bool:
         """Imposta il valore di una chiave.
 
         Args:

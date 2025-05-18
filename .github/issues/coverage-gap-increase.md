@@ -2,7 +2,9 @@
 
 ## Scope
 
-Incrementare la copertura dei test dal corrente 81% all'85% entro la fine del milestone G6. Questo miglioramento è fondamentale per garantire la qualità e la stabilità del codice, focalizzandosi sui componenti critici dell'applicazione.
+Incrementare la copertura dei test dal corrente 81% all'85% entro la fine del milestone G6.
+Questo miglioramento è fondamentale per garantire la qualità e la stabilità del codice,
+focalizzandosi sui componenti critici dell'applicazione.
 
 ## Approach
 

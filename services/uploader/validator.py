@@ -88,22 +88,14 @@ async def validate_upload_file(
 
     if not validate_size(file_size, max_size_bytes):
         error_msg = (
-            f"File size {file_size / (1024*1024):.2f} MB exceeds maximum of "
-            f"{max_size_bytes / (1024*1024):.2f} MB."
+            f"File size {file_size / (1024*1024):.2f} MB exceeds maximum of " f"{max_size_bytes / (1024*1024):.2f} MB."
         )
-        raise HTTPException(
-            status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE, detail=error_msg
-        )
+        raise HTTPException(status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE, detail=error_msg)
 
     if not validate_mime(file.content_type, allowed_mimes):
         allowed_types_str = ", ".join(allowed_mimes)
-        error_msg = (
-            f"File MIME type '{file.content_type}' is not allowed. "
-            f"Allowed types: {allowed_types_str}."
-        )
-        raise HTTPException(
-            status_code=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE, detail=error_msg
-        )
+        error_msg = f"File MIME type '{file.content_type}' is not allowed. " f"Allowed types: {allowed_types_str}."
+        raise HTTPException(status_code=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE, detail=error_msg)
 
     sanitized = sanitize_filename(file.filename or "default_upload")
 

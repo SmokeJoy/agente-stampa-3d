@@ -2,7 +2,7 @@
 
 ## Scope
 
-Implementare la generazione di documentazione HTML per l'API OpenAPI 3.1 utilizzando Redocly, 
+Implementare la generazione di documentazione HTML per l'API OpenAPI 3.1 utilizzando Redocly,
 per fornire una documentazione interattiva, esteticamente gradevole e sempre aggiornata.
 
 ## Obiettivi

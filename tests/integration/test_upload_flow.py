@@ -4,7 +4,6 @@ These tests verify that files can be uploaded through the API endpoint,
 processed correctly, and stored properly.
 """
 
-import importlib
 import tempfile
 from unittest.mock import patch
 
@@ -75,9 +74,7 @@ async def test_upload_endpoint_e2e():
             import main
 
             # Create a client and send the file to the endpoint
-            async with httpx.AsyncClient(
-                transport=ASGITransport(app=main.app), base_url="http://test"
-            ) as client:
+            async with httpx.AsyncClient(transport=ASGITransport(app=main.app), base_url="http://test") as client:
                 # Read the file that was saved to disk
                 with open(tmp_file_path, "rb") as f:
                     file_content = f.read()

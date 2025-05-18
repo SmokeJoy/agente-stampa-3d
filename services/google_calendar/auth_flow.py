@@ -46,9 +46,7 @@ def load_credentials(scopes: list[str]) -> Credentials | None:
         # Attempt to load or create new credentials if still not valid
         if not creds or not creds.valid:
             try:
-                flow = InstalledAppFlow.from_client_secrets_file(
-                    str(settings.google_client_secret_file), scopes
-                )
+                flow = InstalledAppFlow.from_client_secrets_file(str(settings.google_client_secret_file), scopes)
                 # Utilizza 0 per una porta scelta dinamicamente
                 # se google_oauth_port non è cruciale o è 0.
                 creds = flow.run_local_server(port=settings.google_oauth_port)
@@ -57,15 +55,12 @@ def load_credentials(scopes: list[str]) -> Credentials | None:
                 logger.info("Nuovo token salvato in %s", token_file)
             except FileNotFoundError:
                 logger.error(
-                    "File client_secret.json non trovato in %s. "
-                    "Impossibile procedere con autenticazione.",
+                    "File client_secret.json non trovato in %s. " "Impossibile procedere con autenticazione.",
                     settings.google_client_secret_file,
                 )
                 return None
             except Exception as e:
-                logger.error(
-                    "Errore durante il flusso di autorizzazione: %s", e  # noqa: E501
-                )
+                logger.error("Errore durante il flusso di autorizzazione: %s", e)  # noqa: E501
                 return None
 
     return creds

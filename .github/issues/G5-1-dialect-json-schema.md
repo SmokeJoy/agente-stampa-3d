@@ -2,7 +2,7 @@
 
 ## Scope
 
-Implementare e validare un dialect JSON Schema personalizzato per il progetto AGENTE STAMPA 3D, 
+Implementare e validare un dialect JSON Schema personalizzato per il progetto AGENTE STAMPA 3D,
 che estende le funzionalità standard di OpenAPI 3.1 con parole chiave custom necessarie per le regole Spectral.
 
 ## Obiettivi

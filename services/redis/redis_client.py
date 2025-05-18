@@ -100,9 +100,7 @@ class RedisClient:
         """
         return self.client.get(key)
 
-    def set(
-        self, key: str, value: Union[str, bytes, int, float], ex: Optional[int] = None
-    ) -> bool:
+    def set(self, key: str, value: Union[str, bytes, int, float], ex: Optional[int] = None) -> bool:
         """Set a string value in Redis with optional expiration.
 
         Args:

@@ -30,10 +30,7 @@ def get_default_key(request: Request, key_prefix: str = "ratelimit") -> str:
         str: Rate limit key
     """
     # Get client IP, considering possible proxy headers
-    client_ip = (
-        request.headers.get("X-Forwarded-For", "").split(",")[0].strip()
-        or request.client.host
-    )
+    client_ip = request.headers.get("X-Forwarded-For", "").split(",")[0].strip() or request.client.host
 
     # Create a unique key based on IP address
     key_hash = hashlib.md5(client_ip.encode()).hexdigest()
@@ -95,9 +92,7 @@ def rate_limit(
         """
 
         @functools.wraps(func)
-        async def wrapper(
-            request: Request, response: Response, *args: Any, **kwargs: Any
-        ) -> Any:
+        async def wrapper(request: Request, response: Response, *args: Any, **kwargs: Any) -> Any:
             """Wrapper function that enforces rate limiting.
 
             Args:
@@ -133,9 +128,7 @@ def rate_limit(
                     current_time = int(time.time())
 
                 # Remove expired entries from the sliding window
-                redis_client.client.zremrangebyscore(
-                    sorted_set_key, 0, current_time - window_seconds
-                )
+                redis_client.client.zremrangebyscore(sorted_set_key, 0, current_time - window_seconds)
 
                 # Get current count before adding this request
                 current_count = redis_client.client.zcard(sorted_set_key)
@@ -161,9 +154,7 @@ def rate_limit(
 
                 # Add current request to the sliding window
                 member_id = f"{current_time}-{func.__name__}"
-                member_value = (
-                    f"{member_id}-{hash(str(args) + str(kwargs))}"  # noqa: E501
-                )
+                member_value = f"{member_id}-{hash(str(args) + str(kwargs))}"  # noqa: E501
                 redis_client.client.zadd(sorted_set_key, {member_value: current_time})
 
                 # Set expiry on the sorted set
@@ -175,9 +166,7 @@ def rate_limit(
                 # Add rate limit headers to response
                 response.headers["X-RateLimit-Limit"] = str(max_calls)
                 response.headers["X-RateLimit-Remaining"] = str(remaining)
-                response.headers["X-RateLimit-Reset"] = str(
-                    redis_client.client.ttl(sorted_set_key)
-                )
+                response.headers["X-RateLimit-Reset"] = str(redis_client.client.ttl(sorted_set_key))
             except Exception as e:
                 # Log l'errore
                 print(f"Rate limit error: {str(e)}. Proceeding without rate limiting.")

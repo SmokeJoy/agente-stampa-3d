@@ -84,31 +84,22 @@ async def search_jobs(
         filtered_jobs = [
             job
             for job in filtered_jobs
-            if keyword.lower() in job.title.lower()
-            or (job.description and keyword.lower() in job.description.lower())
+            if keyword.lower() in job.title.lower() or (job.description and keyword.lower() in job.description.lower())
         ]
 
     if location:
         filtered_jobs = [
-            job
-            for job in filtered_jobs
-            if job.location and location.lower() in job.location.lower()  # noqa: E501
+            job for job in filtered_jobs if job.location and location.lower() in job.location.lower()  # noqa: E501
         ]
 
     if min_budget is not None:
         filtered_jobs = [job for job in filtered_jobs if job.budget >= min_budget]
 
     if max_budget is not None:
-        filtered_jobs = [
-            job for job in filtered_jobs if job.budget <= max_budget
-        ]  # noqa: E501
+        filtered_jobs = [job for job in filtered_jobs if job.budget <= max_budget]  # noqa: E501
 
     if tags:
-        filtered_jobs = [
-            job
-            for job in filtered_jobs
-            if job.tags and any(tag in job.tags for tag in tags)
-        ]
+        filtered_jobs = [job for job in filtered_jobs if job.tags and any(tag in job.tags for tag in tags)]
 
     # Calcola l'offset per la paginazione
     total = len(filtered_jobs)

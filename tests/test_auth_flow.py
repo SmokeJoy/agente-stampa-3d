@@ -64,15 +64,9 @@ def test_load_credentials_new_token_flow(
 
     credentials = load_credentials(scopes=TEST_SCOPES)
 
-    MockInstalledAppFlow.from_client_secrets_file.assert_called_once_with(
-        str(mock_client_secret_file), TEST_SCOPES
-    )
-    mock_flow_instance.run_local_server.assert_called_once_with(
-        port=settings.google_oauth_port
-    )
-    assert (
-        mock_token_file.exists()
-    ), "Il file token.json mockato dovrebbe essere stato creato"
+    MockInstalledAppFlow.from_client_secrets_file.assert_called_once_with(str(mock_client_secret_file), TEST_SCOPES)
+    mock_flow_instance.run_local_server.assert_called_once_with(port=settings.google_oauth_port)
+    assert mock_token_file.exists(), "Il file token.json mockato dovrebbe essere stato creato"
     assert mock_token_file.read_text() == '{"token": "mock_token_value"}'
     assert credentials == mock_creds_object
     assert credentials.valid
@@ -102,9 +96,7 @@ def test_load_credentials_existing_valid_token(
 
     credentials = load_credentials(scopes=TEST_SCOPES)
 
-    MockCredentials.from_authorized_user_file.assert_called_once_with(
-        str(mock_token_file), TEST_SCOPES
-    )
+    MockCredentials.from_authorized_user_file.assert_called_once_with(str(mock_token_file), TEST_SCOPES)
     MockInstalledAppFlow.from_client_secrets_file.assert_not_called()
     assert credentials == mock_creds_instance
     assert credentials.valid
@@ -150,14 +142,10 @@ def test_load_credentials_expired_token_refresh_success(
 
     credentials = load_credentials(scopes=TEST_SCOPES)
 
-    MockCredentials.from_authorized_user_file.assert_called_once_with(
-        str(mock_token_file), TEST_SCOPES
-    )
+    MockCredentials.from_authorized_user_file.assert_called_once_with(str(mock_token_file), TEST_SCOPES)
     mock_creds_instance.refresh.assert_called_once_with(MockRequest())
     MockInstalledAppFlow.from_client_secrets_file.assert_not_called()
-    assert mock_token_file.read_text() == (
-        '{"token": "refreshed_token", "refresh_token": "valid_refresh_token"}'
-    )
+    assert mock_token_file.read_text() == ('{"token": "refreshed_token", "refresh_token": "valid_refresh_token"}')
     assert credentials == mock_creds_instance
     assert credentials.valid
 

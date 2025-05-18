@@ -16,10 +16,7 @@ API_PREFIX = f"/api/{API_VERSION}"
 # Create the FastAPI app with metadata
 app = FastAPI(
     title="API Assistente Lavori 3D",
-    description=(
-        "API per l'assistente di stampa 3D con funzionalità di upload, "
-        "ricerca e calendario"
-    ),
+    description=("API per l'assistente di stampa 3D con funzionalità di upload, " "ricerca e calendario"),
     version="0.1.0",
 )
 

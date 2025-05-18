@@ -40,9 +40,7 @@ def test_dialect_schema_is_valid(mif_dialect_schema):
     assert "$schema" in mif_dialect_schema, "Dialect schema manca del campo $schema"
     assert "$id" in mif_dialect_schema, "Dialect schema manca del campo $id"
     assert "title" in mif_dialect_schema, "Dialect schema manca del campo title"
-    assert (
-        "properties" in mif_dialect_schema
-    ), "Dialect schema manca del campo properties"
+    assert "properties" in mif_dialect_schema, "Dialect schema manca del campo properties"
 
     # Verifica che il dialect specifichi l'endpoint $schema corretto
     assert (
@@ -50,25 +48,19 @@ def test_dialect_schema_is_valid(mif_dialect_schema):
     ), "Dialect schema deve riferirsi a draft 2020-12 di JSON Schema"
 
     # Verifica che il dialect abbia un $id valido e univoco
-    assert mif_dialect_schema["$id"].startswith(
-        "https://"
-    ), "Dialect schema deve avere un $id che inizia con https://"
+    assert mif_dialect_schema["$id"].startswith("https://"), "Dialect schema deve avere un $id che inizia con https://"
 
 
 def test_dialect_contains_custom_keywords(mif_dialect_schema):
     """Verifica che il dialect contenga le keyword custom richieste."""
     # Verifica x-internal
-    path_props = mif_dialect_schema["properties"]["paths"]["patternProperties"]["^/"][
-        "properties"
-    ]
-    assert (
-        "x-internal" in path_props
-    ), "Dialect manca della keyword x-internal per paths"
+    path_props = mif_dialect_schema["properties"]["paths"]["patternProperties"]["^/"]["properties"]
+    assert "x-internal" in path_props, "Dialect manca della keyword x-internal per paths"
 
     # Verifica x-risk
-    schema_props = mif_dialect_schema["properties"]["components"]["properties"][
-        "schemas"
-    ]["patternProperties"]["^[a-zA-Z0-9._-]+$"]["properties"]
+    schema_props = mif_dialect_schema["properties"]["components"]["properties"]["schemas"]["patternProperties"][
+        "^[a-zA-Z0-9._-]+$"
+    ]["properties"]
     assert "x-risk" in schema_props, "Dialect manca della keyword x-risk per schemas"
 
     # Verifica enum values per x-risk

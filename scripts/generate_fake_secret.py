@@ -25,9 +25,7 @@ def generate_fake_google_secret_file(
             "project_id": "fake-project-id",
             "auth_uri": "https://accounts.google.com/o/oauth2/auth",
             "token_uri": "https://oauth2.googleapis.com/token",
-            "auth_provider_x509_cert_url": (
-                "https://www.googleapis.com/oauth2/v1/certs"
-            ),
+            "auth_provider_x509_cert_url": ("https://www.googleapis.com/oauth2/v1/certs"),
             "client_secret": "FAKE_CLIENT_SECRET_VALUE",  # pragma: allowlist secret
             "redirect_uris": [
                 # Corrisponde a settings.google_oauth_port (default)
@@ -47,14 +45,10 @@ def generate_fake_google_secret_file(
 
 
 if __name__ == "__main__":
-    print(
-        "Generazione del file client_secret.json fittizio " "per ambienti di test/CI..."
-    )
+    print("Generazione del file client_secret.json fittizio " "per ambienti di test/CI...")
     generate_fake_google_secret_file()
     print("Script completato.")
-    print(
-        "Ricorda di assicurarti che la directory 'secrets/' sia nel tuo .gitignore"  # noqa: E501
-    )
+    print("Ricorda di assicurarti che la directory 'secrets/' sia nel tuo .gitignore")  # noqa: E501
     print(
         "e che questo file fittizio sia disponibile nel percorso corretto "  # noqa: E501
         "durante i test in CI."
