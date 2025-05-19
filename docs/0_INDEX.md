@@ -24,6 +24,8 @@ Ecco un elenco gerarchico dei documenti disponibili. Ogni voce è un link clicca
     - [`logbook_unificato_dev_ai.md`](./logbook/logbook_unificato_dev_ai.md) - Logbook cronologico delle attività di sviluppo.
   - **`decisions/`**
     - [`decisions.md`](./decisions/decisions.md) - Registro delle decisioni architetturali e tecniche chiave.
+  - **`research/`**
+    - [`piano_ricerca_parte1.md`](./research/piano_ricerca_parte1.md) - Piano di Ricerca – Parte 1: Guida metodologica deep-research.
 
 ## 🔄 Stato Roadmap Principale (v2)
 
@@ -51,3 +53,5 @@ La tabella seguente mostra lo stato di avanzamento delle principali fasi e check
 
 ---
 *Questo indice deve essere mantenuto aggiornato con ogni nuova aggiunta o modifica significativa alla struttura della documentazione.*
+
+<!-- TODO: Automatizzare la generazione di questa sezione tramite script tools/gen_docs_index.py -->

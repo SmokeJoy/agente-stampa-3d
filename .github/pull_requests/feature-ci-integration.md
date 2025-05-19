@@ -27,3 +27,4 @@ Questa PR implementa l'integrazione della CI pipeline con GitHub Actions, suppor
 ## Note aggiuntive
 
 La PR implementa quanto richiesto dal Teach Lead e rispetta le regole di sviluppo del progetto.
+ 

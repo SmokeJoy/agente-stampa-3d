@@ -47,3 +47,4 @@ Attualmente la copertura dei test è all'81%, l'obiettivo è raggiungere l'85% e
 ## Note
 
 Il miglioramento della coverage si concentrerà sulla qualità dei test, non solo sulla percentuale. L'obiettivo è assicurare che i test siano significativi e contribuiscano a prevenire regressioni e bug nel codice. 
+ 

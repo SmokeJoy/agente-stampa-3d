@@ -562,3 +562,21 @@ Finalizzazione del JSON Schema dialect (`mif_jsonschema_dialect.json`) per soddi
 * Aprire issue G5-3 per la documentazione HTML con Redocly
 
 ---
+
+2025-05-19T16:42:00Z – Archiviato Piano di Ricerca Parte 1 – file docs/research/piano_ricerca_parte1.md
+
+**TICKET:** G5-docs-idx
+**ATTIVITÀ:** Archiviazione e indicizzazione del Piano di Ricerca Parte 1
+**DETTAGLI:**
+- Creato e archiviato il documento metodologico primario per la deep-research
+- Aggiornato indice principale e navigazione (0_INDEX.md)
+
+**FILE COINVOLTI:**
+- docs/research/piano_ricerca_parte1.md
+- docs/0_INDEX.md
+- docs/logbook/logbook_unificato_dev_ai.md
+
+**MOTIVAZIONE:**
+Garantire tracciabilità e accessibilità al piano di ricerca validato, come richiesto dal Teach Lead.
+
+---
