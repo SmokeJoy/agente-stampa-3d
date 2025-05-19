@@ -36,6 +36,8 @@ jobs:
         with:
           node-version: 20
           cache: "npm"
+        env:
+          PATH: ${{ env.PATH }}
 
       - name: Install JS dev-dependencies (Spectral)
         run: npm ci
