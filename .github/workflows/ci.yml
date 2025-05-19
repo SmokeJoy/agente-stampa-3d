@@ -47,6 +47,9 @@ jobs:
           echo "Installing dependencies with Poetry…"
           poetry install --no-interaction --no-root
 
+          echo "Installing pre-commit hooks…"
+          poetry run pre-commit install --install-hooks --overwrite
+
           echo "Running pre-commit…"
           poetry run pre-commit run --all-files --show-diff-on-failure
 
